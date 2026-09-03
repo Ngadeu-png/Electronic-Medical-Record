@@ -4,7 +4,7 @@ import {
   Route,
 } from "react-router-dom";
 
-// import application layouts and pages
+// Layouts and pages
 import App_Layout from "../routes/app_layout";
 import Login from "../pages/auths/Login";
 import Register from "../pages/auths/Register";
@@ -12,25 +12,30 @@ import LandingPage from "../pages/LandingPage";
 import ForgotPassword from "../pages/auths/ForgotPassword";
 import VerificationCode from "../pages/auths/VerificationCode";
 import ResetPassword from "../pages/auths/ResetPassword";
+
+// Patient
+import PatientLayout from "../layout/PatientLayout";
+import Overview from "../pages/patient/Patientoverview";
 import BookAppointmentForm from "../pages/patient/appointment";
 import ConsultationJoin from "../pages/patient/consultation";
-import Overview from "../pages/patient/Patientoverview";
-import Adminpage from "../pages/admin/Overview";
-import PatientLayout from "../layout/PatientLayout";
+import Myrecord from "../pages/patient/Myrecord";
+
+// Admin
 import AdminLayout from "../layout/AdminLayout";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import Adminpage from "../pages/admin/Overview";
 import Consultation from "../pages/admin/Consultation";
 import DoctorForm from "../pages/admin/DoctorForm";
-import Myrecord from "../pages/patient/Myrecord";
-import DoctorAppoint from "../pages/doctor/DoctorAppoint";
-import DoctorLayout from "../layout/DoctorLayout";
-import Availability from "../pages/doctor/Availability";
 import PatientList from "../components/PatientList";
-//import Patientrecord from "../pages/doctor/Patientrecord";
-import Startconsultion from "../pages/doctor/Startconsultation";
-import Startconsultation from "../pages/doctor/Startconsultation";
-import Patientrecord from "../pages/doctor/Patientrecord";
-import Patient from "../pages/doctor/Patient";
+
+// Doctor
+import DoctorLayout from "../layout/DoctorLayout";
 import DoctorOverview from "../pages/doctor/DoctorOverview";
+import Availability from "../pages/doctor/Availability";
+import DoctorAppoint from "../pages/doctor/DoctorAppoint";
+import Startconsultation from "../pages/doctor/Startconsultation";
+import Patient from "../pages/doctor/Patient";
+import Patientrecord from "../pages/doctor/Patientrecord";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -45,32 +50,34 @@ export const router = createBrowserRouter(
         <Route path="reset-password" element={<ResetPassword />} />
       </Route>
 
+      {/* Patient Routes */}
       <Route path="/patient" element={<PatientLayout />}>
         <Route index element={<Overview />} />
         <Route path="appointment" element={<BookAppointmentForm />} />
         <Route path="consultation" element={<ConsultationJoin />} />
-        <Route path="consultation" element={<ConsultationJoin />} />
         <Route path="Myrecord" element={<Myrecord />} />
       </Route>
 
+      {/* Admin Routes */}
       <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Overview />} />
+        <Route index element={<AdminDashboard />} />
         <Route path="appointment" element={<Adminpage />} />
         <Route path="Consultation" element={<Consultation />} />
         <Route path="DoctorForm" element={<DoctorForm />} />
         <Route path="patients" element={<PatientList />} />
       </Route>
+
+      {/* Doctor Routes */}
       <Route path="/Doctor" element={<DoctorLayout />}>
         <Route index element={<DoctorOverview />} />
         <Route path="Availability" element={<Availability />} />
+        <Route path="availability" element={<Availability />} />
         <Route path="DoctorAppoint" element={<DoctorAppoint />} />
+        <Route path="doctorAppoint" element={<DoctorAppoint />} />
         <Route path=":doctorId/appointments" element={<DoctorAppoint />} />
         <Route path="Startconsultation" element={<Startconsultation />} />
         <Route path="patients" element={<Patient />} />
         <Route path="patients/patient/:patientId" element={<Patientrecord />} />
-
-        {/* <Route path="Patientrecord" element={<Patientrecord />} /> */}
-        {/* <Route path="Startconsultation" element={<Startconsultation />} /> */}
       </Route>
     </Route>
   )

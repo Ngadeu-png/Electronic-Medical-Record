@@ -1,39 +1,41 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, User, Calendar, Phone } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDoctorAppointments } from "../../redux/slices/appointmentSlice";
+import { Search, User, Calendar, Phone, Stethoscope, FileText, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
-const fmtDate = (iso) => new Date(iso).toLocaleDateString();
+const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString() : "—");
 
-export default function PatientList() {
+export default function DoctorPatientList() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [query, setQuery] = useState("");
-  const [showOnlyTop, setShowOnlyTop] = useState(false);
-  const [patients, setPatients] = useState([]);
+
+  const { doctorAppointments, status } = useSelector((state) => state.appointments);
 
   useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:5000/api/auths", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await res.json();
-        console.log("data:", data.data);
-        setPatients(data.data || []);
-      } catch (err) {
-        console.log("Error fetching patients:", err);
-      }
-    };
+    dispatch(fetchDoctorAppointments());
+  }, [dispatch]);
 
-    fetchPatients();
-  }, []);
+  // Extract unique assigned patients from doctor's active appointments
+  const patients = useMemo(() => {
+    const patientMap = new Map();
+    doctorAppointments.forEach((appt) => {
+      const patient = appt.userId;
+      if (patient && patient._id && !patientMap.has(patient._id)) {
+        patientMap.set(patient._id, {
+          ...patient,
+          latestAppointment: appt,
+        });
+      }
+    });
+    return Array.from(patientMap.values());
+  }, [doctorAppointments]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const list = patients.filter((p) => {
+    return patients.filter((p) => {
       if (!q) return true;
       return (
         (p.username && p.username.toLowerCase().includes(q)) ||
@@ -41,23 +43,15 @@ export default function PatientList() {
         (p.mrn && p.mrn.toLowerCase().includes(q))
       );
     });
-
-    return list;
   }, [patients, query]);
-
- 
-  const awardIds = useMemo(
-    () => filtered.slice(0, 2).map((p) => p._id),
-    [filtered]
-  );
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Patients</h1>
-          <p className="text-sm text-slate-500">
-            Minimalistic award-style cards with search
+          <h1 className="text-2xl font-bold text-gray-800">My Assigned Patients</h1>
+          <p className="text-xs text-slate-500">
+            Patients currently allocated to your care by hospital administration.
           </p>
         </div>
 
@@ -69,111 +63,95 @@ export default function PatientList() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by name, email or MRN..."
-              className="pl-10 pr-3 py-2 w-72 rounded-full border border-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              className="pl-9 pr-3 py-2 w-72 rounded-xl text-xs border border-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
             />
           </label>
-
-          <button
-            onClick={() => setShowOnlyTop((s) => !s)}
-            className={`px-3 py-2 rounded-md font-medium border transition-shadow shadow-sm ${
-              showOnlyTop
-                ? "bg-indigo-600 text-white border-indigo-600"
-                : "bg-white text-slate-700 border-slate-200"
-            }`}
-          >
-            {showOnlyTop ? "Showing Awards" : "Show Awards"}
-          </button>
         </div>
       </header>
 
       <main>
-        {filtered.length === 0 ? (
-          <div className="py-20 text-center text-slate-500">
-            No patients found — try another search.
+        {status === "loading" && patients.length === 0 ? (
+          <div className="py-20 text-center text-slate-400 text-xs">
+            Loading assigned patients...
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="py-20 text-center bg-white rounded-2xl border border-gray-100 p-8">
+            <User className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+            <h3 className="font-semibold text-gray-700 text-sm">No patients found</h3>
+            <p className="text-xs text-gray-400 mt-1">
+              {query
+                ? "No assigned patient matches your search query."
+                : "You do not currently have any active patients assigned to your care."}
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((p, idx) => {
-              const isAward =
-                awardIds.includes(p._id) && (!showOnlyTop || showOnlyTop);
-              if (showOnlyTop && !isAward) return null;
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filtered.map((p) => {
+              const appt = p.latestAppointment;
               return (
                 <motion.article
                   layout
                   key={p._id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 8 }}
-                  className="relative bg-white rounded-2xl border border-slate-100 p-5 shadow-sm hover:shadow-lg transition-shadow"
+                  className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="flex-none">
-                      <div className="w-14 h-14 rounded-full bg-slate-100 grid place-items-center text-xl font-semibold text-slate-700">
+                  <div>
+                    <div className="flex items-center gap-3.5 mb-3">
+                      <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 font-bold text-lg flex items-center justify-center flex-shrink-0">
                         {p.username?.slice(0, 1).toUpperCase()}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h2 className="text-sm font-bold text-gray-800 truncate">
+                            {p.username}
+                          </h2>
+                          <span className="text-[10px] bg-purple-50 text-purple-700 font-semibold px-2 py-0.5 rounded-full border border-purple-200">
+                            {p.gender || "Patient"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 truncate">{p.email}</p>
                       </div>
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <h2 className="text-lg font-semibold truncate">
-                          {p.username}
-                        </h2>
-                        <span className="text-xs text-slate-500">{p.role}</span>
+                    <div className="bg-gray-50 p-3 rounded-xl text-xs text-gray-600 space-y-1 mb-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-400">MRN:</span>
+                        <span className="font-bold text-purple-800">{p.mrn || "Pending"}</span>
                       </div>
-
-                      <p className="text-sm text-slate-500 truncate">
-                        {p.email}
-                      </p>
-
-                      <div className="mt-3 flex items-center gap-3 text-sm text-slate-500">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>{p.dob ? fmtDate(p.dob) : "—"}</span>
+                      {appt && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-400">Reason:</span>
+                          <span className="font-medium truncate max-w-[150px]">{appt.reason}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Phone className="w-4 h-4" />
-                          <span className="truncate">{p.phone || "—"}</span>
+                      )}
+                      {p.dob && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-400">DOB:</span>
+                          <span>{fmtDate(p.dob)}</span>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                      <User className="w-4 h-4" />
-                      <span className="text-xs text-slate-500">
-                        MRN: {p.mrn || "—"}
-                      </span>
-                    </div>
+                  <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                    <span className="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      Authorized Care
+                    </span>
 
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() =>
-                          navigate(`/Doctor/patients/patient/${p._id}`, {
-                            state: { patient: p },
-                          })
-                        }
-                        className="px-3 py-1.5 rounded-md border border-slate-200 text-sm font-medium hover:bg-slate-50"
-                      >
-                        Open
-                      </button>
-
-                      <button
-                        onClick={() =>
-                          alert(
-                            `Quick action: message or attach file\n\nPatient info:\n${JSON.stringify(
-                              p,
-                              null,
-                              2
-                            )}`
-                          )
-                        }
-                        className="px-3 py-1.5 rounded-md bg-indigo-600 text-white text-sm font-medium hover:opacity-95"
-                      >
-                        Message
-                      </button>
-                    </div>
+                    <button
+                      onClick={() =>
+                        navigate(`/Doctor/patients/patient/${p._id}`, {
+                          state: { patient: p, appointment: appt },
+                        })
+                      }
+                      className="px-3.5 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 transition flex items-center gap-1 shadow-sm"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      Open Record
+                    </button>
                   </div>
                 </motion.article>
               );
@@ -182,8 +160,8 @@ export default function PatientList() {
         )}
       </main>
 
-      <footer className="mt-6 text-xs text-slate-400 text-center">
-        Showing {filtered.length} patient(s)
+      <footer className="mt-8 text-xs text-slate-400 text-center">
+        Showing {filtered.length} authorized patient(s)
       </footer>
     </div>
   );
