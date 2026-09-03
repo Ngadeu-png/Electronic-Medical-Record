@@ -162,14 +162,32 @@ const notificationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ─────────────────────────────────────────────
+//  AI Chat / Conversation History Schema
+// ─────────────────────────────────────────────
+const aiChatSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    role: { type: String, required: true },
+    prompt: { type: String, required: true },
+    response: { type: String, required: true },
+    targetPatientId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    targetPatientName: { type: String },
+    targetRecordId: { type: mongoose.Schema.Types.ObjectId, ref: "MedicalRecord" },
+  },
+  { timestamps: true }
+);
+
 const User = mongoose.model("User", userSchema);
 const Appoints = mongoose.model("Appointment", appointmentSchema);
 const MedicalRecord = mongoose.model("MedicalRecord", MedicalRecordSchema);
 const Notification = mongoose.model("Notification", notificationSchema);
+const AiChat = mongoose.model("AiChat", aiChatSchema);
 
 module.exports = {
   User,
   Appoints,
   MedicalRecord,
   Notification,
+  AiChat,
 };

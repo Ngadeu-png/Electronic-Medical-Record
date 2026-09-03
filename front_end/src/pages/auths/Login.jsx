@@ -145,6 +145,8 @@
 // export default Login;
 import { useContext, useState } from "react";
 import { motion } from "framer-motion";
+import { useDispatch } from "react-redux";
+import { clearAiState } from "../../redux/slices/aiSlice";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import { Link, useNavigate } from "react-router-dom";
@@ -154,6 +156,7 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { setUser } = useContext(AuthContext);
 
   const handleChange = (e) => {
@@ -199,6 +202,7 @@ const Login = () => {
       }
 
       
+      dispatch(clearAiState());
       setUser(data.data);
       localStorage.setItem("user", JSON.stringify(data.data));
       localStorage.setItem("token", data.token);

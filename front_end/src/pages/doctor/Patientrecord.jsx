@@ -415,6 +415,7 @@ const PatientRecord = () => {
           className="max-w-3xl mx-auto"
         >
           <AIAssistant
+            initialPatientId={patientId}
             patientContext={patientContext}
             onInsertToSOAP={(aiSuggestion) => {
               setFormData((prev) => ({
