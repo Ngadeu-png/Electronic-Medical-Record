@@ -8,6 +8,7 @@ import {
   clearRecordMessages,
 } from "../../redux/slices/medicalRecordSlice";
 import MedicalRecordList from "../../components/Dashboard/MedicalRecordList";
+import AIAssistant from "../../components/Dashboard/AIAssistant";
 import {
   User,
   Calendar,
@@ -16,6 +17,7 @@ import {
   AlertCircle,
   PlusCircle,
   ArrowLeft,
+  Sparkles,
 } from "lucide-react";
 
 const noteTypes = [
@@ -57,6 +59,10 @@ const PatientRecord = () => {
   });
 
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const patientContext = patientData
+    ? `Patient: ${patientData.username}, MRN: ${patientData.mrn || "Pending"}, Gender: ${patientData.gender || "Not specified"}. Active Doctor: Dr. ${currentUser.username || ""} (${currentUser.specialty || "General"}). Current SOAP input - Subjective: "${formData.subjective || "None yet"}", Objective: "${formData.objective || "None yet"}", Assessment: "${formData.assessment || "None yet"}"`
+    : "";
 
   useEffect(() => {
     if (patientId) {
@@ -239,6 +245,17 @@ const PatientRecord = () => {
           <PlusCircle className="w-3.5 h-3.5" />
           Write Clinical Note (SOAP)
         </button>
+        <button
+          onClick={() => setActiveTab("ai")}
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
+            activeTab === "ai"
+              ? "bg-purple-600 text-white shadow-sm"
+              : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-100"
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+          AI Clinical Assistant
+        </button>
       </div>
 
       {/* Records Tab */}
@@ -344,9 +361,19 @@ const PatientRecord = () => {
 
             {/* P - Plan */}
             <div>
-              <label className="block text-xs font-semibold text-indigo-900 mb-1">
-                P — Plan (Treatment, medication, patient education, follow-up)
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-semibold text-indigo-900">
+                  P — Plan (Treatment, medication, patient education, follow-up)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("ai")}
+                  className="flex items-center gap-1 text-[11px] text-purple-700 hover:text-purple-900 font-semibold"
+                >
+                  <Sparkles className="w-3 h-3 text-amber-500" />
+                  AI Clinical Suggestions
+                </button>
+              </div>
               <textarea
                 name="plan"
                 rows={3}
@@ -377,6 +404,28 @@ const PatientRecord = () => {
               </button>
             </div>
           </form>
+        </motion.div>
+      )}
+
+      {/* AI Assistant Tab */}
+      {activeTab === "ai" && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-3xl mx-auto"
+        >
+          <AIAssistant
+            patientContext={patientContext}
+            onInsertToSOAP={(aiSuggestion) => {
+              setFormData((prev) => ({
+                ...prev,
+                plan: prev.plan
+                  ? `${prev.plan}\n\n[AI Recommendation]:\n${aiSuggestion}`
+                  : aiSuggestion,
+              }));
+              setActiveTab("new");
+            }}
+          />
         </motion.div>
       )}
     </div>

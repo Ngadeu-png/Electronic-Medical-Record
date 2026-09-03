@@ -7,6 +7,7 @@ import {
   Clock,
   Users,
   LogOut,
+  Sparkles,
 } from "lucide-react";
 
 function DoctorSidebar() {
@@ -89,6 +90,20 @@ function DoctorSidebar() {
           >
             <Users className="w-4 h-4" />
             <span>My Patients</span>
+          </NavLink>
+
+          <NavLink
+            to="/Doctor/ai"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
+                isActive
+                  ? "bg-white text-purple-800 shadow-sm"
+                  : "text-purple-100 hover:bg-purple-600/60"
+              }`
+            }
+          >
+            <Sparkles className="w-4 h-4 text-amber-300" />
+            <span>AI Assistant</span>
           </NavLink>
         </nav>
       </div>

@@ -3,6 +3,7 @@ import { CiCalendarDate } from "react-icons/ci";
 import { GiMiracleMedecine } from "react-icons/gi";
 
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Sparkles } from "lucide-react";
 
 const PatientSidebar = () => {
   const navigate = useNavigate();
@@ -65,6 +66,19 @@ const PatientSidebar = () => {
                 }`}
               >
                 <span>My Record</span>
+              </li>
+            )}
+          </NavLink>
+
+          <NavLink to="/patient/ai">
+            {({ isActive }) => (
+              <li
+                className={`flex items-center gap-4 hover:bg-white hover:text-black cursor-pointer p-3 ${
+                  isActive ? "bg-white text-black" : ""
+                }`}
+              >
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>AI Health Assistant</span>
               </li>
             )}
           </NavLink>

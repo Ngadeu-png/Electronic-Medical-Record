@@ -4,6 +4,7 @@ import patientReducer from "./slices/patientSlice";
 import viewModeReducer from "./slices/viewModeSlice";
 import appointmentReducer from "./slices/appointmentSlice";
 import medicalRecordReducer from "./slices/medicalRecordSlice";
+import aiReducer from "./slices/aiSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     viewMode: viewModeReducer, // 'grid' or 'table'
     appointments: appointmentReducer,
     medicalRecords: medicalRecordReducer,
+    ai: aiReducer,
   },
 });
 

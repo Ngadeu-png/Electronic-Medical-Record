@@ -1,11 +1,13 @@
-import { Outlet } from "react-router-dom"
+import { Outlet } from "react-router-dom";
+import FloatingAIButton from "../components/Dashboard/FloatingAIButton";
 
 const App_layout = () => {
   return (
-    <div>
-       <Outlet />
+    <div className="relative min-h-screen">
+      <Outlet />
+      <FloatingAIButton />
     </div>
-  )
-}
+  );
+};
 
-export default App_layout
+export default App_layout;
