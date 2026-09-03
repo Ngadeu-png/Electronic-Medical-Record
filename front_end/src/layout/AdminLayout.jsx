@@ -8,7 +8,7 @@ const AdminLayout = () => {
   return (
     <div>
       <AdminSidebard />
-      <main className="pl-52">
+      <main className="pl-56">
         <Header />
         <Outlet />
       </main>

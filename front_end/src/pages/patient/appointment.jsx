@@ -1,29 +1,34 @@
 import React, { useContext, useState } from "react";
+import { useDispatch } from "react-redux";
+import { bookAppointment } from "../../redux/slices/appointmentSlice";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import Select from "react-select";
 import { AuthContext } from "../../api/context/AuthContext";
+import { CheckCircle, AlertCircle } from "lucide-react";
 
 const appointmentTypes = [
   { value: "Outpatient", label: "Outpatient" },
-  { value: "InPatient", label: "InPatient" },
+  { value: "Inpatient", label: "Inpatient" },
   { value: "Emergency", label: "Emergency" },
   { value: "Virtual", label: "Virtual" },
   { value: "Preventive", label: "Preventive" },
 ];
 
 const BookAppointmentForm = () => {
+  const dispatch = useDispatch();
   const { user } = useContext(AuthContext);
   const [formData, setFormData] = useState({
-    name: "",
+    name: user?.username || "",
     age: "",
-    type: "",
+    type: "Outpatient",
     reason: "",
     appointmentDate: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,39 +41,39 @@ const BookAppointmentForm = () => {
     setMessage("");
 
     const newBody = {
-      userId: user?._id ?? "",
-      type: formData.type,
+      userId: user?._id || JSON.parse(localStorage.getItem("user") || "{}")._id,
+      type: formData.type || "Outpatient",
       reason: formData.reason,
       appointmentDate: formData.appointmentDate,
       name: formData.name,
       age: formData.age,
     };
 
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/appointments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newBody),
-      });
-      const data = await response.json();
+    if (!newBody.userId) {
+      setMessage("Please log in before booking an appointment.");
+      setIsSuccess(false);
+      setLoading(false);
+      return;
+    }
 
-      if (response.ok) {
-        setMessage("Appointment booked successfully!");
+    try {
+      const resultAction = await dispatch(bookAppointment(newBody));
+      if (bookAppointment.fulfilled.match(resultAction)) {
+        setIsSuccess(true);
+        setMessage("Appointment booked successfully! It is now pending administrative doctor assignment.");
         setFormData({
-          name: "",
+          name: user?.username || "",
           age: "",
           type: "Outpatient",
           reason: "",
           appointmentDate: "",
         });
       } else {
-        setMessage("Error: " + (data.error || "Failed to book"));
+        setIsSuccess(false);
+        setMessage(resultAction.payload || "Failed to book appointment.");
       }
     } catch (error) {
+      setIsSuccess(false);
       setMessage("Network error: " + error.message);
     } finally {
       setLoading(false);
@@ -76,16 +81,38 @@ const BookAppointmentForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-white to-pink-200 px-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-white to-pink-200 px-6 py-10">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-2xl bg-white/20 p-8 rounded-xl shadow-2xl backdrop-blur-md border border-white/30"
+        className="w-full max-w-2xl bg-white/40 p-8 rounded-2xl shadow-2xl backdrop-blur-md border border-white/40"
       >
-        <h2 className="text-3xl font-extrabold text-purple-800 mb-8 text-center">
-          Book Appointment
-        </h2>
+        <div className="text-center mb-6">
+          <h2 className="text-3xl font-extrabold text-purple-900 mb-1">
+            Book a Medical Appointment
+          </h2>
+          <p className="text-xs text-gray-600">
+            Submit your consultation request. A qualified hospital physician will be assigned to your case.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {message && (
+          <div
+            className={`mb-6 p-3 rounded-xl text-xs flex items-center gap-2 ${
+              isSuccess
+                ? "bg-green-100 text-green-800 border border-green-300"
+                : "bg-red-100 text-red-800 border border-red-300"
+            }`}
+          >
+            {isSuccess ? (
+              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+            )}
+            <span>{message}</span>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <InputField
             label="Full Name"
             type="text"
@@ -107,7 +134,7 @@ const BookAppointmentForm = () => {
           />
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-purple-900 mb-1">
               Appointment Type
             </label>
             <Select
@@ -117,34 +144,35 @@ const BookAppointmentForm = () => {
               onChange={(option) =>
                 setFormData((prev) => ({ ...prev, type: option.value }))
               }
-              className="rounded-xl"
+              className="rounded-xl text-xs"
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Appointment Date & Time
+            <label className="block text-sm font-medium text-purple-900 mb-1">
+              Preferred Appointment Date & Time
             </label>
             <input
               type="datetime-local"
               name="appointmentDate"
               value={formData.appointmentDate}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-md bg-white/70 text-gray-900 border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+              className="w-full px-4 py-2.5 rounded-lg bg-white/70 text-gray-900 border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 text-xs"
               required
             />
           </div>
 
-          <div className="md-span-2">
+          <div className="md:col-span-2">
             <label className="block text-sm font-medium text-purple-900 mb-1">
-              Reason for appointment
+              Chief Complaint / Reason for Consultation
             </label>
             <textarea
+              rows={3}
               name="reason"
               value={formData.reason}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-md bg-white/70 text-gray-900 placeholder-gray-500 border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
-              placeholder="Reason for appointment"
+              className="w-full px-4 py-2.5 rounded-lg bg-white/70 text-gray-900 placeholder-gray-500 border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 text-xs resize-none"
+              placeholder="Describe your current symptoms, how long you've had them, or reason for this visit..."
               required
             />
           </div>
@@ -152,14 +180,9 @@ const BookAppointmentForm = () => {
 
         <div className="mt-8 flex flex-col items-center">
           <Button
-            text={loading ? "Booking..." : "Book Appointment"}
+            text={loading ? "Booking Consultation..." : "Submit Appointment Request"}
             type="submit"
           />
-          {message && (
-            <p className="mt-4 text-sm font-medium text-center text-purple-800">
-              {message}
-            </p>
-          )}
         </div>
       </form>
     </div>

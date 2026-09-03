@@ -1,11 +1,15 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
 const User = require("../models/db-models").User;
+const checkIfAuthenticated = require("../middleware.js");
+
+router.use(checkIfAuthenticated);
 
 // GET all patients (role=patient)
 router.get("/", async (req, res) => {
   try {
-    const patients = await User.find({ role: "patient" });
+    const patients = await User.find({ role: "patient" }).select("-password");
     res.json(patients);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -18,17 +22,25 @@ router.post("/", async (req, res) => {
     const { username, email, password, dob, phone, gender } = req.body;
     const existing = await User.findOne({ email });
     if (existing) return res.status(409).json({ message: "Email already in use" });
+    
+    const hashedPassword = await bcrypt.hash(password || "Password123!", 10);
+    const mrn = `MRN-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
     const user = new User({
       username,
       email,
-      password,
+      password: hashedPassword,
       role: "patient",
       dob,
       phone,
       gender,
+      mrn,
     });
     await user.save();
-    res.status(201).json(user);
+    
+    const userObj = user.toObject();
+    delete userObj.password;
+    res.status(201).json(userObj);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -37,7 +49,7 @@ router.post("/", async (req, res) => {
 // GET a single patient by id
 router.get("/:id", async (req, res) => {
   try {
-    const patient = await User.findById(req.params.id);
+    const patient = await User.findById(req.params.id).select("-password");
     if (!patient) return res.status(404).json({ message: "Patient not found" });
     if (patient.role !== "patient")
       return res.status(403).json({ message: "User is not a patient" });
@@ -50,7 +62,14 @@ router.get("/:id", async (req, res) => {
 // PUT update patient
 router.put("/:id", async (req, res) => {
   try {
-    const updated = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updateData = { ...req.body };
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    }
+    const updated = await User.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+      select: "-password",
+    });
     if (!updated) return res.status(404).json({ message: "Patient not found" });
     res.json(updated);
   } catch (err) {
@@ -64,22 +83,6 @@ router.delete("/:id", async (req, res) => {
     const deleted = await User.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ message: "Patient not found" });
     res.json({ message: "Patient deleted" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Assign a doctor to a patient appointment (approve)
-router.put("/:id/assign-doctor", async (req, res) => {
-  const { doctorId } = req.body;
-  try {
-    const patient = await User.findById(req.params.id);
-    if (!patient) return res.status(404).json({ message: "Patient not found" });
-    // Here you could also update an Appointment document if you have one;
-    // for now we just update the patient's assigned doctor field (if you add it)
-    patient.assignedDoctor = doctorId;
-    await patient.save();
-    res.json({ message: "Doctor assigned to patient", patient });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -8,7 +8,7 @@ const DoctorLayout = () => {
   return (
     <div>
       <DoctorSidebar />
-      <main className="pl-52">
+      <main className="pl-56">
         <Header />
         <Outlet />
       </main>

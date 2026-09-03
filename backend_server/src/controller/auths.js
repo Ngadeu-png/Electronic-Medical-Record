@@ -1,19 +1,16 @@
 const { User } = require("../models/db-models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const fs = require("fs");
-const path = require("path");
-const SENDMAIL = require("../../utils/nodeMailer.config");
+
 const secret_key = "shdkffhifhihf9847wyry8rhafha";
+
+// ─────────────────────────────────────────────────────────────
+//  SIGNUP
+// ─────────────────────────────────────────────────────────────
 const signup = async (req, res) => {
   try {
-    const { username, email, password, confirmPassword, dob, phone, role } =
+    const { username, email, password, confirmPassword, dob, phone, gender, role } =
       req.body;
-
-    const currentYear = new Date().getFullYear();
-    const sequenceName = `MRN${currentYear}`;
-
-    const mrn = `MRN-${currentYear}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     if (!username || !email || !password || !confirmPassword) {
       return res.status(400).json({ error: "All fields are required" });
@@ -22,14 +19,19 @@ const signup = async (req, res) => {
     if (password !== confirmPassword) {
       return res.status(400).json({ error: "Passwords do not match" });
     }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ error: "User already exists" });
     }
-    if (role === "doctor" && !speciality) {
-      return res.status(409).json({ error: "All fields are required" });
-    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate MRN for patients
+    const mrn =
+      role === "patient"
+        ? `MRN-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`
+        : undefined;
 
     const newUser = await User.create({
       username,
@@ -37,45 +39,32 @@ const signup = async (req, res) => {
       password: hashedPassword,
       dob,
       phone,
-      role,
+      gender,
+      role: role || "patient",
       mrn,
     });
 
-    if (newUser.role === "doctor") {
-      const templatePath = path.join(
-        __dirname,
-        "../Mailtemplate",
-        "doctorTem.html"
-      );
-      let htmlTemplate = fs.readFileSync(templatePath, "utf-8");
-      htmlTemplate = htmlTemplate
-        .replace("{{name}}", doctor.name)
-        .replace("{{password}}", doctor.password);
-
-      const msg = {
-        to: doctor.email,
-        subject: "Your Account Has Been Created On CentriCare",
-        content: htmlTemplate,
-        html: true,
-      };
-      await SENDMAIL(msg, (success, err) => {
-        if (err) {
-          console.log(err, "An error occurred while sending the email");
-        }
-      });
-    }
     return res.status(201).json({
       message: "User created successfully",
-      user: newUser,
+      user: {
+        _id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+        role: newUser.role,
+        mrn: newUser.mrn,
+      },
     });
   } catch (err) {
-    console.log(err, "heeee");
+    console.error("Signup error:", err);
     return res
       .status(500)
       .json({ error: "Server error", details: err.message });
   }
 };
 
+// ─────────────────────────────────────────────────────────────
+//  LOGIN
+// ─────────────────────────────────────────────────────────────
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -101,15 +90,29 @@ const login = async (req, res) => {
     return res.status(200).json({
       message: "Login successful",
       token: token,
-      data: user,
+      data: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        specialty: user.specialty,
+        mrn: user.mrn,
+        dob: user.dob,
+        phone: user.phone,
+        gender: user.gender,
+      },
     });
   } catch (err) {
+    console.error("Login error:", err);
     return res
       .status(500)
       .json({ error: "Server error", details: err.message });
   }
 };
 
+// ─────────────────────────────────────────────────────────────
+//  RESET PASSWORD
+// ─────────────────────────────────────────────────────────────
 const resetPassword = async (req, res) => {
   try {
     const { email, newPassword } = req.body;
@@ -131,19 +134,26 @@ const resetPassword = async (req, res) => {
 
     return res.status(200).json({ message: "Password reset successful" });
   } catch (err) {
+    console.error("Reset password error:", err);
     return res
       .status(500)
       .json({ error: "Server error", details: err.message });
   }
 };
 
+// ─────────────────────────────────────────────────────────────
+//  GET PATIENTS  (admin use — returns only patients)
+// ─────────────────────────────────────────────────────────────
 const getPatients = async (req, res) => {
   try {
-    const patients = await User.find().sort({ createdAt: -1 });
+    const patients = await User.find({ role: "patient" })
+      .select("-password")
+      .sort({ createdAt: -1 });
     return res
       .status(200)
       .json({ data: patients, message: "Patients fetched successfully" });
-  } catch (error) {
+  } catch (err) {
+    console.error("Get patients error:", err);
     return res
       .status(500)
       .json({ error: "Server error", details: err.message });

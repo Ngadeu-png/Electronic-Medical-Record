@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { secret_key } = require("../src/controller/auths");
+
 const checkIfAuthenticated = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   if (!authHeader) {
@@ -13,13 +14,16 @@ const checkIfAuthenticated = (req, res, next) => {
       .status(401)
       .json({ message: "No token provided", success: false });
   }
-  const verifytoken = jwt.verify(token, secret_key);
-  if (!verifytoken) {
-    return res.status(403).json({ message: "Invalid token", success: false });
-  }
 
-  req.user = verifytoken.user;
-  console.log(req.user, "helloooo");
-  next();
+  try {
+    const verifytoken = jwt.verify(token, secret_key);
+    req.user = verifytoken.user;
+    next();
+  } catch (err) {
+    return res
+      .status(403)
+      .json({ message: "Invalid or expired token", success: false });
+  }
 };
+
 module.exports = checkIfAuthenticated;
