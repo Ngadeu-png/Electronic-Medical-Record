@@ -36,6 +36,7 @@ import DoctorAppoint from "../pages/doctor/DoctorAppoint";
 import Startconsultation from "../pages/doctor/Startconsultation";
 import Patient from "../pages/doctor/Patient";
 import Patientrecord from "../pages/doctor/Patientrecord";
+import AIPage from "../pages/ai/AIPage";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -56,6 +57,7 @@ export const router = createBrowserRouter(
         <Route path="appointment" element={<BookAppointmentForm />} />
         <Route path="consultation" element={<ConsultationJoin />} />
         <Route path="Myrecord" element={<Myrecord />} />
+        <Route path="ai" element={<AIPage />} />
       </Route>
 
       {/* Admin Routes */}
@@ -65,6 +67,7 @@ export const router = createBrowserRouter(
         <Route path="Consultation" element={<Consultation />} />
         <Route path="DoctorForm" element={<DoctorForm />} />
         <Route path="patients" element={<PatientList />} />
+        <Route path="ai" element={<AIPage />} />
       </Route>
 
       {/* Doctor Routes */}
@@ -78,6 +81,7 @@ export const router = createBrowserRouter(
         <Route path="Startconsultation" element={<Startconsultation />} />
         <Route path="patients" element={<Patient />} />
         <Route path="patients/patient/:patientId" element={<Patientrecord />} />
+        <Route path="ai" element={<AIPage />} />
       </Route>
     </Route>
   )

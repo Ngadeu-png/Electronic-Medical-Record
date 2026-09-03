@@ -1,0 +1,29 @@
+# Environment variables
+.env
+.env*.local
+backend_server/.env
+
+# Dependencies
+node_modules/
+backend_server/node_modules/
+front_end/node_modules/
+
+# Build artifacts
+dist/
+dist-ssr/
+front_end/dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Uploads / files
+backend_server/files/
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
