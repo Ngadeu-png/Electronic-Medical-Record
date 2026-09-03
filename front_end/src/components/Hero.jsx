@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import backgroundImage from "../assets/background_image.jpg";
 
 const Hero = () => {
   return (
     <section
       id="home"
-      className="min-h-screen flex items-center justify-center bg-gradient- from-purple-100 via-white to-pink-100 px-6 relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center bg-cover bg-center px-6 relative overflow-hidden"
+      style={{ backgroundImage: `url(${backgroundImage})` }}
     >
       <motion.div
         className="text-center max-w-3xl z-10"
