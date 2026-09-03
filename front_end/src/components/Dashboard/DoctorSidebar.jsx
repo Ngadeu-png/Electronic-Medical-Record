@@ -1,5 +1,7 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { clearAiState } from "../../redux/slices/aiSlice";
 import {
   LayoutDashboard,
   CalendarCheck,
@@ -12,8 +14,10 @@ import {
 
 function DoctorSidebar() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
+    dispatch(clearAiState());
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/auths/login");

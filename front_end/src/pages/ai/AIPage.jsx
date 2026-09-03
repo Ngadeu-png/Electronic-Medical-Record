@@ -44,7 +44,7 @@ const AIPage = () => {
 
       {/* Main AI Workspace */}
       <div className="max-w-4xl mx-auto space-y-6">
-        <AIAssistant patientContext={systemContext} />
+        <AIAssistant key={currentUser?._id || "anon"} patientContext={systemContext} />
 
         {/* Info / Safety Advisory */}
         <div className="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 text-xs text-amber-900 flex items-start gap-3">

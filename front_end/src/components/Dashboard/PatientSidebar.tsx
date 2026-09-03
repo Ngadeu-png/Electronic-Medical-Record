@@ -3,14 +3,19 @@ import { CiCalendarDate } from "react-icons/ci";
 import { GiMiracleMedecine } from "react-icons/gi";
 
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { clearAiState } from "../../redux/slices/aiSlice";
 import { Sparkles } from "lucide-react";
 
 const PatientSidebar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
+    dispatch(clearAiState());
     localStorage.removeItem("token"); 
     localStorage.removeItem("role");
+    localStorage.removeItem("user");
     navigate("/auths/login"); 
   };
 

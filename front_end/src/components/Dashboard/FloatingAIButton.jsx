@@ -1,10 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sparkles, X, Bot, ChevronDown } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import AIAssistant from "./AIAssistant";
 
 const FloatingAIButton = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+
+  const token = localStorage.getItem("token");
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const userId = currentUser?._id;
+
+  // Automatically close floating drawer when route changes to auth pages
+  useEffect(() => {
+    if (location.pathname.startsWith("/auths") || location.pathname === "/") {
+      setIsOpen(false);
+    }
+  }, [location.pathname]);
+
+  // Do not render floating button on login/register/landing pages or when unauthenticated
+  if (!token || !userId || location.pathname.startsWith("/auths") || location.pathname === "/") {
+    return null;
+  }
 
   const context = `User: ${currentUser.username || "Staff"}, Role: ${
     currentUser.role || "Healthcare User"
@@ -14,7 +31,7 @@ const FloatingAIButton = () => {
     <div className="fixed bottom-6 right-6 z-50">
       {/* Floating Dialog Panel */}
       {isOpen && (
-        <div className="mb-4 w-[92vw] sm:w-[480px] max-h-[82vh] bg-white rounded-3xl shadow-2xl border border-purple-200 overflow-hidden flex flex-col animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="mb-4 w-[92vw] sm:w-[500px] max-h-[82vh] bg-white rounded-3xl shadow-2xl border border-purple-200 overflow-hidden flex flex-col animate-in fade-in slide-in-from-bottom-5 duration-200">
           {/* Top close bar */}
           <div className="bg-purple-900 text-white px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-semibold">
@@ -30,9 +47,9 @@ const FloatingAIButton = () => {
             </button>
           </div>
 
-          {/* Scrollable Assistant Body */}
+          {/* Scrollable Assistant Body - Keyed strictly by userId for 100% user isolation */}
           <div className="overflow-y-auto max-h-[calc(82vh-50px)]">
-            <AIAssistant patientContext={context} />
+            <AIAssistant key={userId} patientContext={context} />
           </div>
         </div>
       )}
