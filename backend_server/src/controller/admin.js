@@ -1,9 +1,7 @@
 const { Types } = require("mongoose");
 const { Appoints, User, Notification } = require("../models/db-models.js");
 
-// ─────────────────────────────────────────────────────────────
-//  Helper: create an in-app notification
-// ─────────────────────────────────────────────────────────────
+
 const createNotification = async (recipientId, type, message, appointmentId) => {
   try {
     await Notification.create({

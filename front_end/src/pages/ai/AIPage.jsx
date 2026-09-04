@@ -22,14 +22,22 @@ const AIPage = () => {
               <h1 className="text-xl font-bold text-gray-800">
                 CentriCare AI Clinical Intelligence
               </h1>
-              <span className="px-2.5 py-0.5 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full border border-purple-200">
-                Active Gemini Engine
-              </span>
+              
             </div>
             <p className="text-xs text-gray-500 mt-1">
               Secure, server-side assisted diagnosis, clinical note formulation, and medical documentation support.
             </p>
+          </div><div className="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 text-xs text-amber-900 flex items-start gap-3">
+          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <div className="font-semibold text-amber-950">
+              
+            </div>
+            <p className="text-amber-800 leading-relaxed text-[11px]">
+            
+            </p>
           </div>
+        </div>
         </div>
 
         <div className="flex items-center gap-3">
@@ -42,22 +50,11 @@ const AIPage = () => {
         </div>
       </div>
 
-      {/* Main AI Workspace */}
+      
       <div className="max-w-4xl mx-auto space-y-6">
         <AIAssistant key={currentUser?._id || "anon"} patientContext={systemContext} />
 
-        {/* Info / Safety Advisory */}
-        <div className="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 text-xs text-amber-900 flex items-start gap-3">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <div className="font-semibold text-amber-950">
-              HIPAA & Clinical Safety Advisory
-            </div>
-            <p className="text-amber-800 leading-relaxed text-[11px]">
-              AI recommendations provided by CentriCare AI are generated via backend-isolated services for clinical decision support. All diagnoses, prescriptions, and therapeutic plans must be critically reviewed and validated by a licensed physician before applying to clinical treatment.
-            </p>
-          </div>
-        </div>
+        
       </div>
     </div>
   );
