@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema(
     specialty: { type: String },
     phone: { type: String },
     gender: { type: String },
+    address: { type: String },
+    photo: { type: String },
     role: { type: String, enum: ["patient", "doctor", "admin"], default: "patient" },
   },
   { timestamps: true }
@@ -153,6 +155,9 @@ const notificationSchema = new mongoose.Schema(
         "redirection_requested",
         "reassignment_needed",
         "medical_record_created",
+        "trusted_access_granted",
+        "trusted_access_updated",
+        "trusted_access_revoked",
       ],
     },
     message: { type: String, required: true },
@@ -178,11 +183,133 @@ const aiChatSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ─────────────────────────────────────────────
+//  Emergency Medical Profile Schema
+// ─────────────────────────────────────────────
+const emergencyMedicalProfileSchema = new mongoose.Schema(
+  {
+    patient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true,
+    },
+    bloodType: {
+      type: String,
+      enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"],
+      default: "Unknown",
+    },
+    allergies: [{ type: String }],
+    height: { type: Number }, // in cm
+    weight: { type: Number }, // in kg
+    criticalConditions: [{ type: String }],
+    currentImportantMedications: [{ type: String }],
+    surgeries: [{ type: String }],
+    emergencyWarnings: { type: String },
+    emergencyInstructions: { type: String },
+  },
+  { timestamps: true }
+);
+
+// ─────────────────────────────────────────────
+//  Emergency Contact / Trusted Person Schema
+// ─────────────────────────────────────────────
+const emergencyContactSchema = new mongoose.Schema(
+  {
+    patient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    contactUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    isRegisteredUser: { type: Boolean, default: false },
+    firstName: { type: String, required: true },
+    lastName: { type: String },
+    photo: { type: String },
+    phone: { type: String, required: true },
+    alternativePhone: { type: String },
+    email: { type: String },
+    relationship: {
+      type: String,
+      enum: [
+        "Parent",
+        "Spouse",
+        "Brother",
+        "Sister",
+        "Child",
+        "Relative",
+        "Friend",
+        "Guardian",
+        "Other",
+      ],
+      required: true,
+    },
+    address: { type: String },
+    priority: {
+      type: String,
+      enum: ["Primary", "Secondary", "Tertiary"],
+      default: "Primary",
+    },
+    isActive: { type: Boolean, default: true },
+    emergencyAccessEnabled: { type: Boolean, default: false },
+    accessLevel: {
+      type: Number,
+      enum: [1, 2, 3], // 1: Emergency Summary, 2: Limited Medical Info, 3: Authorized Medical Record Access
+      default: 1,
+    },
+  },
+  { timestamps: true }
+);
+
+// ─────────────────────────────────────────────
+//  Emergency Access Log Schema (Audit Trail)
+// ─────────────────────────────────────────────
+const emergencyAccessLogSchema = new mongoose.Schema(
+  {
+    patient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    accessedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    role: { type: String, required: true },
+    accessType: {
+      type: String,
+      enum: ["doctor_emergency_view", "trusted_person_view", "hospital_search"],
+      default: "doctor_emergency_view",
+    },
+    reason: { type: String },
+    permissionsUsed: { type: String },
+    ipAddress: { type: String },
+    timestamp: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+
 const User = mongoose.model("User", userSchema);
 const Appoints = mongoose.model("Appointment", appointmentSchema);
 const MedicalRecord = mongoose.model("MedicalRecord", MedicalRecordSchema);
 const Notification = mongoose.model("Notification", notificationSchema);
 const AiChat = mongoose.model("AiChat", aiChatSchema);
+const EmergencyMedicalProfile = mongoose.model(
+  "EmergencyMedicalProfile",
+  emergencyMedicalProfileSchema
+);
+const EmergencyContact = mongoose.model(
+  "EmergencyContact",
+  emergencyContactSchema
+);
+const EmergencyAccessLog = mongoose.model(
+  "EmergencyAccessLog",
+  emergencyAccessLogSchema
+);
 
 module.exports = {
   User,
@@ -190,4 +317,7 @@ module.exports = {
   MedicalRecord,
   Notification,
   AiChat,
+  EmergencyMedicalProfile,
+  EmergencyContact,
+  EmergencyAccessLog,
 };

@@ -9,6 +9,8 @@ import {
 } from "../../redux/slices/medicalRecordSlice";
 import MedicalRecordList from "../../components/Dashboard/MedicalRecordList";
 import AIAssistant from "../../components/Dashboard/AIAssistant";
+import EmergencyProfileModal from "../../components/EmergencyProfileModal";
+import { doctorFetchEmergencyProfile } from "../../redux/slices/patientSlice";
 import {
   User,
   Calendar,
@@ -18,6 +20,7 @@ import {
   PlusCircle,
   ArrowLeft,
   Sparkles,
+  ShieldAlert,
 } from "lucide-react";
 
 const noteTypes = [
@@ -43,12 +46,28 @@ const PatientRecord = () => {
   const { records, status, createStatus, error, successMessage } = useSelector(
     (state) => state.medicalRecords
   );
+  const { doctorEmergencyPatient, doctorEmergencyStatus } = useSelector(
+    (state) => state.patients
+  );
 
   const [activeTab, setActiveTab] = useState("records");
   const [patientData, setPatientData] = useState(statePatient || null);
   const [activeAppointmentId, setActiveAppointmentId] = useState(
     stateAppointment?._id || ""
   );
+  const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
+
+  const handleOpenEmergency = () => {
+    if (patientId) {
+      dispatch(
+        doctorFetchEmergencyProfile({
+          patientId,
+          reason: "Consultation Emergency Medical Review",
+        })
+      );
+      setIsEmergencyModalOpen(true);
+    }
+  };
 
   const [formData, setFormData] = useState({
     noteType: "Consultation Note",
@@ -200,7 +219,14 @@ const PatientRecord = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={handleOpenEmergency}
+              className="px-3.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-xs"
+            >
+              <ShieldAlert className="w-4 h-4 text-red-600" />
+              Emergency Profile
+            </button>
             <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full border border-green-200">
               Active Consultation Access
             </span>
@@ -429,6 +455,14 @@ const PatientRecord = () => {
           />
         </motion.div>
       )}
+
+      {/* Doctor Emergency Profile Modal */}
+      <EmergencyProfileModal
+        isOpen={isEmergencyModalOpen}
+        onClose={() => setIsEmergencyModalOpen(false)}
+        data={doctorEmergencyPatient}
+        loading={doctorEmergencyStatus === "loading"}
+      />
     </div>
   );
 };

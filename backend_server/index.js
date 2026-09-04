@@ -10,6 +10,8 @@ const adminRoute = require("./src/routes/admin.route");
 const medicalRecordRoute = require("./src/routes/medicalRecord");
 const patientRoute = require("./src/routes/patientRoutes");
 const aiRoute = require("./src/routes/ai.route");
+const profileRoute = require("./src/routes/profile.route");
+const emergencyRoute = require("./src/routes/emergency.route");
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -28,6 +30,8 @@ app.use("/api/admin", adminRoute);
 app.use("/api/medical-records", medicalRecordRoute);
 app.use("/api/patients", patientRoute);
 app.use("/api/ai", aiRoute);
+app.use("/api/profile", profileRoute);
+app.use("/api/emergency", emergencyRoute);
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

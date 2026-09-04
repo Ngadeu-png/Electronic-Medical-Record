@@ -2,8 +2,10 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDoctorAppointments } from "../../redux/slices/appointmentSlice";
-import { Search, User, Calendar, Phone, Stethoscope, FileText, CheckCircle } from "lucide-react";
+import { Search, User, Calendar, Phone, Stethoscope, FileText, CheckCircle, ShieldAlert } from "lucide-react";
 import { motion } from "framer-motion";
+import { doctorFetchEmergencyProfile } from "../../redux/slices/patientSlice";
+import EmergencyProfileModal from "../../components/EmergencyProfileModal";
 
 const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString() : "—");
 
@@ -11,8 +13,22 @@ export default function DoctorPatientList() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [query, setQuery] = useState("");
+  const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
 
   const { doctorAppointments, status } = useSelector((state) => state.appointments);
+  const { doctorEmergencyPatient, doctorEmergencyStatus } = useSelector(
+    (state) => state.patients
+  );
+
+  const handleOpenEmergency = (patientId) => {
+    dispatch(
+      doctorFetchEmergencyProfile({
+        patientId,
+        reason: "Clinical Emergency Review",
+      })
+    );
+    setIsEmergencyModalOpen(true);
+  };
 
   useEffect(() => {
     dispatch(fetchDoctorAppointments());
@@ -141,17 +157,28 @@ export default function DoctorPatientList() {
                       Authorized Care
                     </span>
 
-                    <button
-                      onClick={() =>
-                        navigate(`/Doctor/patients/patient/${p._id}`, {
-                          state: { patient: p, appointment: appt },
-                        })
-                      }
-                      className="px-3.5 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 transition flex items-center gap-1 shadow-sm"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      Open Record
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleOpenEmergency(p._id)}
+                        className="px-2.5 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold transition flex items-center gap-1"
+                        title="Emergency Medical Profile"
+                      >
+                        <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
+                        Emergency Info
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          navigate(`/Doctor/patients/patient/${p._id}`, {
+                            state: { patient: p, appointment: appt },
+                          })
+                        }
+                        className="px-3.5 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 transition flex items-center gap-1 shadow-sm"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        Open Record
+                      </button>
+                    </div>
                   </div>
                 </motion.article>
               );
@@ -163,6 +190,14 @@ export default function DoctorPatientList() {
       <footer className="mt-8 text-xs text-slate-400 text-center">
         Showing {filtered.length} authorized patient(s)
       </footer>
+
+      {/* Doctor Emergency Profile Modal */}
+      <EmergencyProfileModal
+        isOpen={isEmergencyModalOpen}
+        onClose={() => setIsEmergencyModalOpen(false)}
+        data={doctorEmergencyPatient}
+        loading={doctorEmergencyStatus === "loading"}
+      />
     </div>
   );
 }

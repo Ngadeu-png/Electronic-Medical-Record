@@ -244,6 +244,13 @@ const Overview = () => {
             <h3 className="text-sm font-bold text-gray-800 mb-3">Clinical Actions</h3>
             <div className="space-y-2.5">
               <Link
+                to="/patient/profile"
+                className="flex items-center justify-between p-3 rounded-xl bg-red-50/70 border border-red-100 text-red-900 hover:bg-red-100/70 transition text-xs font-semibold"
+              >
+                <span>Emergency Profile &amp; Trusted Contacts</span>
+                <ArrowRight className="w-4 h-4 text-red-600" />
+              </Link>
+              <Link
                 to="/patient/Myrecord"
                 className="flex items-center justify-between p-3 rounded-xl bg-purple-50 border border-purple-100 text-purple-900 hover:bg-purple-100 transition text-xs font-semibold"
               >
