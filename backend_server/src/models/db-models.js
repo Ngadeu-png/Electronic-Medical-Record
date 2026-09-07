@@ -293,6 +293,82 @@ const emergencyAccessLogSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ─────────────────────────────────────────────
+//  Conversation Schema (1-to-1 patient ↔ doctor)
+// ─────────────────────────────────────────────
+const conversationSchema = new mongoose.Schema(
+  {
+    patient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    doctor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    lastMessage: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+    },
+    lastMessageAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true }
+);
+
+conversationSchema.index({ patient: 1, doctor: 1 }, { unique: true });
+
+// ─────────────────────────────────────────────
+//  Message Schema
+// ─────────────────────────────────────────────
+const messageSchema = new mongoose.Schema(
+  {
+    conversation: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Conversation",
+      required: true,
+      index: true,
+    },
+    sender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    recipient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    messageType: {
+      type: String,
+      enum: ["text", "image", "medical_record"],
+      default: "text",
+    },
+    text: { type: String },
+    image: { type: String },
+    medicalRecord: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MedicalRecord",
+    },
+    replyTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+    },
+    reactions: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        emoji: { type: String, required: true },
+      },
+    ],
+    isRead: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
+
 const User = mongoose.model("User", userSchema);
 const Appoints = mongoose.model("Appointment", appointmentSchema);
 const MedicalRecord = mongoose.model("MedicalRecord", MedicalRecordSchema);
@@ -310,6 +386,8 @@ const EmergencyAccessLog = mongoose.model(
   "EmergencyAccessLog",
   emergencyAccessLogSchema
 );
+const Conversation = mongoose.model("Conversation", conversationSchema);
+const Message = mongoose.model("Message", messageSchema);
 
 module.exports = {
   User,
@@ -320,4 +398,6 @@ module.exports = {
   EmergencyMedicalProfile,
   EmergencyContact,
   EmergencyAccessLog,
+  Conversation,
+  Message,
 };

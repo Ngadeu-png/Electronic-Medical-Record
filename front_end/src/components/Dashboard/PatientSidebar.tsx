@@ -4,7 +4,7 @@ import { GiMiracleMedecine } from "react-icons/gi";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { clearAiState } from "../../redux/slices/aiSlice";
-import { Sparkles, User } from "lucide-react";
+import { Sparkles, User, MessageSquare } from "lucide-react";
 
 const PatientSidebar = () => {
   const navigate = useNavigate();
@@ -99,6 +99,19 @@ const PatientSidebar = () => {
               >
                 <span className="w-4 text-center font-bold">📄</span>
                 <span>My Record</span>
+              </li>
+            )}
+          </NavLink>
+
+          <NavLink to="/patient/chat">
+            {({ isActive }) => (
+              <li
+                className={`flex items-center gap-3 hover:bg-white hover:text-black cursor-pointer p-2.5 rounded-xl transition ${
+                  isActive ? "bg-white text-black font-semibold" : ""
+                }`}
+              >
+                <MessageSquare className="w-4 h-4 flex-shrink-0" />
+                <span>Messages</span>
               </li>
             )}
           </NavLink>

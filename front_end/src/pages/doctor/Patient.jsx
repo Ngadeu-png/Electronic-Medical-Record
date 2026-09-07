@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDoctorAppointments } from "../../redux/slices/appointmentSlice";
-import { Search, User, Calendar, Phone, Stethoscope, FileText, CheckCircle, ShieldAlert } from "lucide-react";
+import { Search, User, Calendar, Phone, Stethoscope, FileText, CheckCircle, ShieldAlert, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import { doctorFetchEmergencyProfile } from "../../redux/slices/patientSlice";
 import EmergencyProfileModal from "../../components/EmergencyProfileModal";
@@ -165,6 +165,15 @@ export default function DoctorPatientList() {
                       >
                         <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
                         Emergency Info
+                      </button>
+
+                      <button
+                        onClick={() => navigate(`/Doctor/chat?patientId=${p._id}`)}
+                        className="px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold transition flex items-center gap-1"
+                        title="Message Patient"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        Message
                       </button>
 
                       <button

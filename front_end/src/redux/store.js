@@ -5,6 +5,7 @@ import viewModeReducer from "./slices/viewModeSlice";
 import appointmentReducer from "./slices/appointmentSlice";
 import medicalRecordReducer from "./slices/medicalRecordSlice";
 import aiReducer from "./slices/aiSlice";
+import chatReducer from "./slices/chatSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     appointments: appointmentReducer,
     medicalRecords: medicalRecordReducer,
     ai: aiReducer,
+    chat: chatReducer,
   },
 });
 
