@@ -38,6 +38,7 @@ import Startconsultation from "../pages/doctor/Startconsultation";
 import Patient from "../pages/doctor/Patient";
 import Patientrecord from "../pages/doctor/Patientrecord";
 import AIPage from "../pages/ai/AIPage";
+import ChatPage from "../pages/chat/ChatPage";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -60,6 +61,7 @@ export const router = createBrowserRouter(
         <Route path="consultation" element={<ConsultationJoin />} />
         <Route path="Myrecord" element={<Myrecord />} />
         <Route path="ai" element={<AIPage />} />
+        <Route path="chat" element={<ChatPage />} />
       </Route>
 
       {/* Admin Routes */}
@@ -84,6 +86,7 @@ export const router = createBrowserRouter(
         <Route path="patients" element={<Patient />} />
         <Route path="patients/patient/:patientId" element={<Patientrecord />} />
         <Route path="ai" element={<AIPage />} />
+        <Route path="chat" element={<ChatPage />} />
       </Route>
     </Route>
   )

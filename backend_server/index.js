@@ -1,6 +1,8 @@
 const dbConnect = require("./src/db/conn");
 const express = require("express");
+const http = require("http");
 const cors = require("cors");
+const { initChatWebSocket } = require("./src/websocket/chatSocket");
 
 // Import routes
 const authsRoute = require("./src/routes/auths.route");
@@ -12,14 +14,20 @@ const patientRoute = require("./src/routes/patientRoutes");
 const aiRoute = require("./src/routes/ai.route");
 const profileRoute = require("./src/routes/profile.route");
 const emergencyRoute = require("./src/routes/emergency.route");
+const chatRoute = require("./src/routes/chat.route");
+
 const app = express();
+const server = http.createServer(app);
 const port = process.env.PORT || 5000;
 
 dbConnect();
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Initialize WebSocket server
+initChatWebSocket(server);
+
+// Middleware (allow 25mb for image attachments)
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 app.use(cors({ origin: "*" }));
 
 // Routes
@@ -32,8 +40,9 @@ app.use("/api/patients", patientRoute);
 app.use("/api/ai", aiRoute);
 app.use("/api/profile", profileRoute);
 app.use("/api/emergency", emergencyRoute);
+app.use("/api/chat", chatRoute);
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
 

@@ -10,6 +10,7 @@ import {
   Users,
   LogOut,
   Sparkles,
+  MessageSquare,
 } from "lucide-react";
 
 function DoctorSidebar() {
@@ -94,6 +95,20 @@ function DoctorSidebar() {
           >
             <Users className="w-4 h-4" />
             <span>My Patients</span>
+          </NavLink>
+
+          <NavLink
+            to="/Doctor/chat"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
+                isActive
+                  ? "bg-white text-purple-800 shadow-sm"
+                  : "text-purple-100 hover:bg-purple-600/60"
+              }`
+            }
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span>Messages</span>
           </NavLink>
 
           <NavLink
