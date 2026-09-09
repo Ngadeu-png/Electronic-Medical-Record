@@ -4,12 +4,10 @@ import { AuthContext } from "../api/context/AuthContext";
 import {
   Search,
   Bell,
-  Calendar,
   ShieldCheck,
   Stethoscope,
   User,
   Activity,
-  Sparkles,
 } from "lucide-react";
 
 const Header = () => {
@@ -90,15 +88,10 @@ const Header = () => {
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 text-xs font-semibold shadow-2xs transition"
           title="Open CentriCare AI Assistant"
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
           <span>Clinical AI</span>
         </Link>
 
-        {/* Date Display */}
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 font-medium px-2.5 py-1.5 rounded-xl bg-gray-50 border border-gray-100">
-          <Calendar className="w-3.5 h-3.5 text-purple-600" />
-          <span>{todayStr}</span>
-        </div>
+  
 
         {/* Notifications Icon with active dot */}
         <button
