@@ -14,9 +14,6 @@ const AIPage = () => {
       {/* Header Banner */}
       <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-md">
-            <BrainCircuit className="w-7 h-7" />
-          </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold text-gray-800">
@@ -27,17 +24,8 @@ const AIPage = () => {
             <p className="text-xs text-gray-500 mt-1">
               Secure, server-side assisted diagnosis, clinical note formulation, and medical documentation support.
             </p>
-          </div><div className="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 text-xs text-amber-900 flex items-start gap-3">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <div className="font-semibold text-amber-950">
-              
-            </div>
-            <p className="text-amber-800 leading-relaxed text-[11px]">
-            
-            </p>
           </div>
-        </div>
+          
         </div>
 
         <div className="flex items-center gap-3">

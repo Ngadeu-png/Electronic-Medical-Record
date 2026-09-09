@@ -1,10 +1,9 @@
 import { MdOutlineDashboard } from "react-icons/md";
 import { CiCalendarDate } from "react-icons/ci";
-import { GiMiracleMedecine } from "react-icons/gi";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { clearAiState } from "../../redux/slices/aiSlice";
-import { Sparkles, User, MessageSquare } from "lucide-react";
+import { User, MessageSquare } from "lucide-react";
 
 const PatientSidebar = () => {
   const navigate = useNavigate();
@@ -77,15 +76,15 @@ const PatientSidebar = () => {
             )}
           </NavLink>
 
-          <NavLink to="/patient/consultation">
+          <NavLink to="/patient/my-appointments">
             {({ isActive }) => (
               <li
                 className={`flex items-center gap-3 hover:bg-white hover:text-black cursor-pointer p-2.5 rounded-xl transition ${
                   isActive ? "bg-white text-black font-semibold" : ""
                 }`}
               >
-                <GiMiracleMedecine className="text-lg flex-shrink-0" />
-                <span>Consultations</span>
+                <CiCalendarDate className="text-lg flex-shrink-0" />
+                <span>My Appointments</span>
               </li>
             )}
           </NavLink>
@@ -123,7 +122,6 @@ const PatientSidebar = () => {
                   isActive ? "bg-white text-black font-semibold" : ""
                 }`}
               >
-                <Sparkles className="w-4 h-4 text-amber-300 flex-shrink-0" />
                 <span>AI Assistant</span>
               </li>
             )}

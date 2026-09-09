@@ -8,7 +8,6 @@ import {
   Stethoscope,
   Users,
   LogOut,
-  Sparkles,
 } from "lucide-react";
 
 const AdminSidebar = () => {
@@ -105,7 +104,6 @@ const AdminSidebar = () => {
               }`
             }
           >
-            <Sparkles className="w-4 h-4 text-amber-300" />
             <span>AI Assistant</span>
           </NavLink>
         </nav>

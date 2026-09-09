@@ -104,7 +104,7 @@ const PatientProfile = () => {
   // Contact Modal State
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [contactMode, setContactMode] = useState("create"); // "create" or "edit"
-  const [contactType, setContactType] = useState("external"); // "external" or "registered"
+  const [contactType, setContactType] = useState("external"); 
   const [userSearchQuery, setUserSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -412,9 +412,7 @@ const PatientProfile = () => {
         </button>
       </div>
 
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 1: PERSONAL INFORMATION
-      ───────────────────────────────────────────────────────────── */}
+     
       {activeTab === "personal" && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Identity Card */}
@@ -758,10 +756,7 @@ const PatientProfile = () => {
           </form>
         </div>
       )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 3: EMERGENCY CONTACTS / TRUSTED PERSONS
-      ───────────────────────────────────────────────────────────── */}
+    
       {activeTab === "contacts" && (
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1028,9 +1023,7 @@ const PatientProfile = () => {
         </div>
       )}
 
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 5: ACCESS AUDIT LOGS
-      ───────────────────────────────────────────────────────────── */}
+      
       {activeTab === "logs" && (
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-4">
           <div>

@@ -203,7 +203,7 @@ const DoctorAppoint = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Assigned Consultations</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Assigned appointment</h1>
           <p className="text-sm text-gray-500">
             Review incoming assignments, accept patient care, or request reassignment.
           </p>
@@ -262,7 +262,7 @@ const DoctorAppoint = () => {
               : "bg-white text-gray-600 hover:bg-gray-100"
           }`}
         >
-          Active Consultations ({acceptedCases.length})
+          Active appointments ({acceptedCases.length})
         </button>
       </div>
 

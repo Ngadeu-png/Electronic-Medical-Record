@@ -274,7 +274,13 @@ const handleAiQuery = async (req, res) => {
       : dbContext;
 
     // 2. Generate AI response from Gemini
-    const aiResponse = await generateGeminiResponse(prompt, fullContext);
+    const aiResult = await generateGeminiResponse(prompt, fullContext);
+    const aiResponse =
+      typeof aiResult === "string" ? aiResult : aiResult?.response;
+
+    if (!aiResponse || typeof aiResponse !== "string") {
+      throw new Error("Gemini returned an invalid response.");
+    }
 
     // 3. Find target patient name if targetPatientId was specified
     let targetPatientName = undefined;
