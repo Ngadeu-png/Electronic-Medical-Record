@@ -1,0 +1,17 @@
+{
+  "name": "emr-smart-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for Electronic Medical Record (EMR) system — deployable to Ganache",
+  "scripts": {
+    "compile": "truffle compile",
+    "migrate": "truffle migrate --network development",
+    "test": "truffle test"
+  },
+  "devDependencies": {
+    "openzeppelin-solidity": "^2.5.0",
+    "truffle": "^5.8.0"
+  },
+  "dependencies": {
+    "web3": "^1.10.0"
+  }
+}
