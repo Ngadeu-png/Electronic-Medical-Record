@@ -58,6 +58,7 @@ export const router = createBrowserRouter(
         <Route index element={<Overview />} />
         <Route path="profile" element={<PatientProfile />} />
         <Route path="appointment" element={<BookAppointmentForm />} />
+        <Route path="my-appointments" element={<Overview />} />
         <Route path="consultation" element={<ConsultationJoin />} />
         <Route path="Myrecord" element={<Myrecord />} />
         <Route path="ai" element={<AIPage />} />

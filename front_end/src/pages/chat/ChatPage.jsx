@@ -241,9 +241,7 @@ const ChatPage = () => {
 
       {/* Main Chat Container */}
       <div className="flex-1 bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col lg:flex-row min-h-[620px]">
-        {/* ─────────────────────────────────────────────────────────────
-            LEFT PANE: CONTACTS & CONVERSATIONS LIST
-        ───────────────────────────────────────────────────────────── */}
+        
         <div
           className={`w-full lg:w-80 border-r border-gray-200 flex flex-col bg-white ${
             mobileShowChat ? "hidden lg:flex" : "flex"
@@ -355,10 +353,6 @@ const ChatPage = () => {
             )}
           </div>
         </div>
-
-        {/* ─────────────────────────────────────────────────────────────
-            RIGHT PANE: ACTIVE CONVERSATION
-        ───────────────────────────────────────────────────────────── */}
         <div
           className={`flex-1 flex flex-col bg-slate-50/30 ${
             !mobileShowChat ? "hidden lg:flex" : "flex"
@@ -729,10 +723,6 @@ const ChatPage = () => {
           )}
         </div>
       </div>
-
-      {/* ─────────────────────────────────────────────────────────────
-          MODALS
-      ───────────────────────────────────────────────────────────── */}
       {/* Medical Record Selector Modal (For Patients) */}
       <MedicalRecordSelectorModal
         isOpen={isRecordSelectorOpen}
