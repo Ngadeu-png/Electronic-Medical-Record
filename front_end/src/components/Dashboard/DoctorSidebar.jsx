@@ -9,7 +9,6 @@ import {
   Clock,
   Users,
   LogOut,
-  Sparkles,
   MessageSquare,
 } from "lucide-react";
 
@@ -121,7 +120,6 @@ function DoctorSidebar() {
               }`
             }
           >
-            <Sparkles className="w-4 h-4 text-amber-300" />
             <span>AI Assistant</span>
           </NavLink>
         </nav>

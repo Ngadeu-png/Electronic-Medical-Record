@@ -210,13 +210,7 @@ const AIAssistant = ({ initialPatientId = "", patientContext = "", onInsertToSOA
               <h3 className="font-bold text-sm sm:text-base tracking-tight">
                 CentriCare AI Assistant
               </h3>
-              <span className="px-2 py-0.5 bg-purple-500/40 text-purple-100 text-[10px] font-semibold rounded-full uppercase tracking-wider border border-white/10">
-                Gemini • Live DB Context
-              </span>
             </div>
-            <p className="text-[11px] text-purple-200">
-              Directly answers questions about doctors, patients, appointments, and medical records.
-            </p>
           </div>
         </div>
 
@@ -258,10 +252,10 @@ const AIAssistant = ({ initialPatientId = "", patientContext = "", onInsertToSOA
               onChange={(e) => setSelectedPatientId(e.target.value)}
               className="w-full sm:w-auto flex-1 bg-white border border-purple-200 rounded-lg px-2.5 py-1 text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-400"
             >
-              <option value="">👥 All My Assigned Patients (General Inquiries)</option>
+              <option value=""> All My Assigned Patients (General Inquiries)</option>
               {contextOptions.patients.map((p) => (
                 <option key={p._id} value={p._id}>
-                  👤 {p.username} {p.mrn ? `(MRN: ${p.mrn})` : ""}
+                   {p.username} {p.mrn ? `(MRN: ${p.mrn})` : ""}
                 </option>
               ))}
             </select>
@@ -274,10 +268,10 @@ const AIAssistant = ({ initialPatientId = "", patientContext = "", onInsertToSOA
               onChange={(e) => setSelectedRecordId(e.target.value)}
               className="w-full sm:w-auto flex-1 bg-white border border-purple-200 rounded-lg px-2.5 py-1 text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-400"
             >
-              <option value="">📋 All My Medical Records & Appointments</option>
+              <option value="">All My Medical Records & Appointments</option>
               {contextOptions.records.map((r) => (
                 <option key={r._id} value={r._id}>
-                  📑 {r.noteType} - {new Date(r.date).toLocaleDateString()} (Dr. {r.doctorName})
+                  {r.noteType} - {new Date(r.date).toLocaleDateString()} (Dr. {r.doctorName})
                 </option>
               ))}
             </select>
@@ -297,7 +291,7 @@ const AIAssistant = ({ initialPatientId = "", patientContext = "", onInsertToSOA
                 <option value="">👥 All Hospital Patients</option>
                 {contextOptions.patients.map((p) => (
                   <option key={p._id} value={p._id}>
-                    👤 Patient: {p.username}
+                    Patient: {p.username}
                   </option>
                 ))}
               </select>
@@ -310,10 +304,10 @@ const AIAssistant = ({ initialPatientId = "", patientContext = "", onInsertToSOA
                 }}
                 className="bg-white border border-purple-200 rounded-lg px-2 py-1 text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-400"
               >
-                <option value="">🩺 All Doctors</option>
+                <option value="">All Doctors</option>
                 {contextOptions.doctors.map((d) => (
                   <option key={d._id} value={d._id}>
-                    👨‍⚕️ Dr. {d.username} ({d.specialty || "General"})
+                     Dr. {d.username} ({d.specialty || "General"})
                   </option>
                 ))}
               </select>

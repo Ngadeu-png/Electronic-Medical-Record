@@ -74,11 +74,7 @@ const FloatingAIButton = () => {
 
         {isOpen ? (
           <ChevronDown className="w-4 h-4 text-purple-200" />
-        ) : (
-          <span className="px-1.5 py-0.5 bg-white/20 text-[10px] font-semibold rounded-full uppercase tracking-wider">
-            Gemini
-          </span>
-        )}
+        ) : null}
       </button>
     </div>
   );
