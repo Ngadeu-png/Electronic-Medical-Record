@@ -369,6 +369,21 @@ const messageSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ─────────────────────────────────────────────
+//  Contract Deployment Schema
+// ─────────────────────────────────────────────
+const contractDeploymentSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    address: { type: String, required: true, unique: true },
+    network: { type: String },
+    deployer: { type: String },
+    txHash: { type: String },
+    deployedAt: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+
 const User = mongoose.model("User", userSchema);
 const Appoints = mongoose.model("Appointment", appointmentSchema);
 const MedicalRecord = mongoose.model("MedicalRecord", MedicalRecordSchema);
@@ -388,6 +403,7 @@ const EmergencyAccessLog = mongoose.model(
 );
 const Conversation = mongoose.model("Conversation", conversationSchema);
 const Message = mongoose.model("Message", messageSchema);
+const ContractDeployment = mongoose.model("ContractDeployment", contractDeploymentSchema);
 
 module.exports = {
   User,
@@ -400,4 +416,5 @@ module.exports = {
   EmergencyAccessLog,
   Conversation,
   Message,
+  ContractDeployment,
 };
