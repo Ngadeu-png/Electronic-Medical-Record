@@ -288,7 +288,7 @@ const AIAssistant = ({ initialPatientId = "", patientContext = "", onInsertToSOA
                 }}
                 className="bg-white border border-purple-200 rounded-lg px-2 py-1 text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-400"
               >
-                <option value="">👥 All Hospital Patients</option>
+                <option value="">All Hospital Patients</option>
                 {contextOptions.patients.map((p) => (
                   <option key={p._id} value={p._id}>
                     Patient: {p.username}
@@ -389,7 +389,7 @@ const AIAssistant = ({ initialPatientId = "", patientContext = "", onInsertToSOA
                 <div className="max-w-[88%] sm:max-w-[80%] space-y-1">
                   <div className="flex items-center gap-1.5 text-[10px] text-gray-400">
                     <span className="font-semibold text-purple-900">CentriCare AI</span>
-                    <span>•</span>
+                    <span></span>
                     <span>
                       {chat.createdAt
                         ? new Date(chat.createdAt).toLocaleTimeString([], {
