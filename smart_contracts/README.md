@@ -1,6 +1,6 @@
 # EMR Smart Contracts
 
-This folder contains a Truffle scaffold for the Electronic Medical Record (EMR) system, ready to deploy to Ganache.
+This folder contains the EMR contract. The backend stores clinical notes and the random salt in MongoDB, and anchors only salted SHA-256 hashes and per-record hashed patient/doctor references on-chain.
 
 Quick start:
 
@@ -10,23 +10,24 @@ Quick start:
 npm install
 ```
 
-2. Run Ganache (desktop app or CLI) and ensure it's listening on `127.0.0.1:7545`.
+2. Run Ganache and ensure it's listening on `127.0.0.1:8545` with chain ID `1337`.
 
-3. Compile and migrate
+3. Compile and deploy the EMR contract
 
 ```bash
 npx truffle compile
-npx truffle migrate --network development
+node deploy_emr.js
 ```
 
-4. Interact via Truffle console
+The deploy script writes the contract address into `build/contracts/EMR.json` under chain ID `1337`. Configure the backend environment:
 
-```bash
-npx truffle console --network development
-const emr = await EMR.deployed()
-await emr.createRecord(accounts[1], accounts[2], "QmHash")
+```env
+ETH_PROVIDER=http://127.0.0.1:8545
+CHAIN_ID=1337
+# Optional: use a specific unlocked Ganache account as the transaction signer.
+ETH_ACCOUNT=0x...
+# Optional: override the address stored in the Truffle artifact.
+EMR_CONTRACT_ADDRESS=0x...
 ```
 
-Notes:
-- This is a minimal example. Consider integrating IPFS for storing actual medical data and storing only references on-chain.
-- Add access control (roles) and encryption before production use.
+The backend defaults to the first unlocked account from the provider when `ETH_ACCOUNT` is unset. Restart the backend after configuration. Medical notes and the random hash salt remain off-chain; do not put patient data or private keys in the contract or source control. This local Ganache setup is for development, not production.

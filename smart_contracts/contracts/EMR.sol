@@ -7,16 +7,16 @@ contract EMR {
 
     struct Record {
         uint256 id;
-        address patient;
-        address doctor;
-        string dataHash; // IPFS / storage reference
+        string patientRef;
+        string doctorRef;
+        string dataHash;
         uint256 timestamp;
     }
 
     mapping(uint256 => Record) public records;
-    mapping(address => uint256[]) public patientRecords;
+    mapping(string => uint256[]) private patientRecords;
 
-    event RecordCreated(uint256 indexed id, address indexed patient, address indexed doctor, string dataHash, uint256 timestamp);
+    event RecordCreated(uint256 indexed id, string patientRef, string doctorRef, address indexed submitter, string dataHash, uint256 timestamp);
 
     modifier onlyOwner(){
         require(msg.sender == owner, "not owner");
@@ -27,16 +27,16 @@ contract EMR {
         owner = msg.sender;
     }
 
-    function createRecord(address _patient, address _doctor, string memory _dataHash) public returns (uint256){
+    function createRecord(string memory _patientRef, string memory _doctorRef, string memory _dataHash) public returns (uint256){
         uint256 id = ++recordCount;
-        records[id] = Record(id, _patient, _doctor, _dataHash, block.timestamp);
-        patientRecords[_patient].push(id);
-        emit RecordCreated(id, _patient, _doctor, _dataHash, block.timestamp);
+        records[id] = Record(id, _patientRef, _doctorRef, _dataHash, block.timestamp);
+        patientRecords[_patientRef].push(id);
+        emit RecordCreated(id, _patientRef, _doctorRef, msg.sender, _dataHash, block.timestamp);
         return id;
     }
 
-    function getRecordsForPatient(address _patient) public view returns (uint256[] memory){
-        return patientRecords[_patient];
+    function getRecordsForPatient(string memory _patientRef) public view returns (uint256[] memory){
+        return patientRecords[_patientRef];
     }
 
     function getRecord(uint256 _id) public view returns (Record memory){

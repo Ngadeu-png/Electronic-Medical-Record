@@ -1,4 +1,6 @@
 const { MedicalRecord, Appoints, Notification } = require("../models/db-models");
+const { createHash, randomBytes } = require("crypto");
+const { anchorRecord } = require("../../ethereum/emrClient");
 
 // ─────────────────────────────────────────────────────────────
 //  Helper: verify doctor has active assignment for this patient
@@ -44,6 +46,7 @@ const addRecord = async (req, res) => {
       }
     }
 
+    const blockchainSalt = randomBytes(32).toString("hex");
     const newRecord = await MedicalRecord.create({
       patient,
       appointment,
@@ -55,7 +58,47 @@ const addRecord = async (req, res) => {
       plan,
       isSigned: true,
       signedAt: new Date(),
+      blockchainStatus: "pending",
+      blockchainSalt,
     });
+
+    const proofPayload = JSON.stringify({
+      recordId: newRecord._id.toString(),
+      patient: patient.toString(),
+      doctor: doctorId.toString(),
+      appointment: appointment.toString(),
+      noteType,
+      subjective,
+      objective,
+      assessment,
+      plan,
+      signedAt: newRecord.signedAt.toISOString(),
+    });
+    newRecord.blockchainDataHash = createHash("sha256")
+      .update(`${blockchainSalt}:${proofPayload}`)
+      .digest("hex");
+    const patientRef = createHash("sha256")
+      .update(`${blockchainSalt}:patient:${patient}`)
+      .digest("hex");
+    const doctorRef = createHash("sha256")
+      .update(`${blockchainSalt}:doctor:${doctorId}`)
+      .digest("hex");
+    await newRecord.save();
+
+    try {
+      const blockchainResult = await anchorRecord({
+        patientId: patientRef,
+        doctorId: doctorRef,
+        dataHash: newRecord.blockchainDataHash,
+      });
+      newRecord.blockchainStatus = "anchored";
+      newRecord.blockchainRecordId = blockchainResult.recordId;
+      newRecord.blockchainTxHash = blockchainResult.transactionHash;
+    } catch (blockchainError) {
+      newRecord.blockchainStatus = "failed";
+      console.warn("Medical record blockchain anchoring failed:", blockchainError.message);
+    }
+    await newRecord.save();
 
     // Notify patient that a medical record has been created
     await Notification.create({
@@ -67,7 +110,9 @@ const addRecord = async (req, res) => {
 
     return res.status(201).json({
       message: "Medical record created successfully",
-      record: newRecord,
+      record: Object.fromEntries(
+        Object.entries(newRecord.toObject()).filter(([key]) => key !== "blockchainSalt")
+      ),
     });
   } catch (err) {
     console.error("Create medical record error:", err);

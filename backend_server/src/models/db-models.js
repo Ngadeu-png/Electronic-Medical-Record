@@ -153,6 +153,15 @@ const MedicalRecordSchema = new mongoose.Schema(
     plan: { type: String, required: true },
     isSigned: { type: Boolean, default: false },
     signedAt: { type: Date },
+    blockchainStatus: {
+      type: String,
+      enum: ["pending", "anchored", "failed"],
+      default: "pending",
+    },
+    blockchainRecordId: { type: String },
+    blockchainTxHash: { type: String },
+    blockchainDataHash: { type: String },
+    blockchainSalt: { type: String, select: false },
   },
   { timestamps: true }
 );

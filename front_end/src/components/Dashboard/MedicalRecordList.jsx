@@ -101,8 +101,26 @@ const MedicalRecordList = ({ records }) => {
             </div>
           </div>
 
-          {/* Signed status */}
-          <div className="flex justify-end">
+          {/* Record and blockchain status */}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="text-sm">
+              {rec.blockchainStatus === "anchored" ? (
+                <span className="font-medium text-green-700">
+                  On-chain anchor confirmed
+                  {rec.blockchainTxHash && (
+                    <span className="ml-2 font-mono text-xs text-slate-500" title={rec.blockchainTxHash}>
+                      {rec.blockchainTxHash.slice(0, 10)}...
+                    </span>
+                  )}
+                </span>
+              ) : rec.blockchainStatus === "pending" ? (
+                <span className="font-medium text-amber-700">Blockchain anchor pending</span>
+              ) : rec.blockchainStatus === "failed" ? (
+                <span className="font-medium text-red-700">Blockchain anchor failed</span>
+              ) : (
+                <span className="font-medium text-slate-500">Not anchored</span>
+              )}
+            </div>
             {rec.isSigned ? (
               <span className="text-sm text-green-600 font-medium">
                 ✅ Signed at {new Date(rec.signedAt).toLocaleString()}
