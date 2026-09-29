@@ -1,0 +1,137 @@
+@startuml EMR_Package_Diagram
+left to right direction
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #444444
+skinparam PackageBorderColor #333333
+skinparam PackageBackgroundColor #EAF5FB
+skinparam ComponentBackgroundColor #D5EDF8
+
+package "React/Vite Client\nHTTP: localhost:5173" as Client {
+  package "Public Access" as Public {
+    [Landing page]
+    [About and services]
+    [Contact]
+  }
+
+  package "Authentication UI" as ClientAuth {
+    [Login]
+    [Signup]
+    [Password reset]
+  }
+
+  package "Role Dashboards" as Dashboards {
+    [Patient dashboard]
+    [Doctor dashboard]
+    [Admin dashboard]
+  }
+
+  package "Patient Workflows" as PatientUI {
+    [Profile and emergency profile]
+    [Appointments]
+    [Medical records]
+    [Payments]
+  }
+
+  package "Doctor Workflows" as DoctorUI {
+    [Patient list]
+    [SOAP / clinical records]
+    [Availability]
+    [Record signing]
+  }
+
+  package "Communication and AI" as InteractiveUI {
+    [Chat]
+    [AI assistant]
+    [Notifications]
+  }
+}
+
+package "Node.js / Express Web Server\nHTTP REST: localhost:5000" as Server {
+  package "Routes / API Modules" as Routes {
+    [Authentication API]
+    [Appointment API]
+    [Medical Record API]
+    [Doctor API]
+    [Admin API]
+    [Patient and Profile API]
+    [Emergency API]
+    [Chat API]
+    [Payment API]
+    [AI API]
+  }
+
+  package "Controllers and Business Workflows" as Controllers {
+    [Authentication and authorization]
+    [Appointment assignment]
+    [Medical record management]
+    [Doctor administration]
+    [Patient and profile management]
+    [Emergency access]
+    [Real-time chat]
+    [Payment verification]
+    [AI context and response generation]
+    [Notifications and welcome email]
+  }
+
+  package "Security and Transport" as Security {
+    [JWT authentication]
+    [Role-based authorization]
+    [CORS and JSON middleware]
+    [WebSocket endpoint /ws]
+  }
+}
+
+package "MongoDB Database\nTCP: localhost:27017" as Mongo {
+  [Users and roles]
+  [Appointments]
+  [Medical records]
+  [Conversations and messages]
+  [Notifications]
+  [Payments]
+  [AI chat history]
+}
+
+package "External Services" as External {
+  [CamPay API\nHTTPS: port 443]
+  [Google Gemini API\nHTTPS: port 443]
+  [Gmail SMTP\nSMTP/TLS: port 587]
+}
+
+package "Prepared Blockchain Layer\nGanache JSON-RPC: localhost:8545" as Blockchain #FFF4D6 {
+  [Web3.js client]
+  [EMR Solidity contract]
+  [Contract ABI and deployment artifact]
+}
+
+Client --> Routes : HTTP REST\nport 5000
+Client --> Security : WebSocket\nws://localhost:5000/ws
+Routes --> Controllers : invokes
+Security --> Controllers : protects requests
+Controllers --> Mongo : Mongoose\nport 27017
+Controllers --> External : HTTPS\nport 443
+Controllers --> External : SMTP\nport 587
+Controllers ..> Blockchain : prepared integration\nWeb3.js / JSON-RPC\nport 8545
+
+Public ..> ClientAuth : access
+ClientAuth ..> Dashboards : authenticated user
+Dashboards ..> PatientUI : patient role
+Dashboards ..> DoctorUI : doctor role
+Dashboards ..> InteractiveUI : shared features
+
+note right of Blockchain
+The current main medical-record workflow
+stores records in MongoDB. The Web3.js
+client and EMR contract are prepared, but
+emrClient.js is not currently called by
+the medical-record controller.
+end note
+
+note bottom of Client
+Vite development server: port 5173
+The browser calls the backend at port 5000.
+end note
+
+@enduml

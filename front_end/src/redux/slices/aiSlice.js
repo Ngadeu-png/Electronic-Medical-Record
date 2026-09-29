@@ -6,7 +6,6 @@ import {
   fetchContextOptions,
 } from "../../api/aiApi";
 
-// Ask AI query with target options
 export const queryAiAssistant = createAsyncThunk(
   "ai/queryAiAssistant",
   async ({ prompt, targetPatientId, targetRecordId, targetDoctorId, customContext }, { rejectWithValue }) => {

@@ -27,16 +27,22 @@ const bookAppointment = async (req, res) => {
       return res.status(400).json({ error: "userId, type, and reason are required" });
     }
 
+    // Default consultation fee is 25 XAF for CamPay demo account testing
+    const fee = req.body.amount || 25;
+
     const newAppointment = await Appoints.create({
       userId,
       type,
       reason,
       appointmentDate: appointmentDate ? new Date(appointmentDate) : undefined,
       status: "pending_admin_assignment",
+      paymentStatus: "pending",
+      amount: fee,
+      currency: "XAF",
     });
 
     return res.status(201).json({
-      message: "Appointment booked successfully",
+      message: "Appointment booked successfully. Please proceed with payment.",
       appointment: newAppointment,
     });
   } catch (err) {
@@ -56,6 +62,7 @@ const getMyAppointments = async (req, res) => {
 
     const appointments = await Appoints.find({ userId })
       .populate("doctorId", "username email specialty")
+      .populate("paymentId")
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -78,6 +85,7 @@ const getAppointments = async (req, res) => {
     const appointments = await Appoints.find()
       .populate("userId", "username email mrn dob phone gender")
       .populate("doctorId", "username email specialty")
+      .populate("paymentId")
       .sort({ createdAt: -1 });
     return res.status(200).json({ data: appointments });
   } catch (err) {
@@ -95,6 +103,7 @@ const getAppointmentById = async (req, res) => {
     const appointment = await Appoints.findById(req.params.id)
       .populate("userId", "username email mrn dob phone gender")
       .populate("doctorId", "username email specialty")
+      .populate("paymentId")
       .populate("assignmentHistory.doctor", "username email specialty")
       .populate("assignmentHistory.assignedBy", "username email");
 

@@ -17,6 +17,7 @@ const aiRoute = require("./src/routes/ai.route");
 const profileRoute = require("./src/routes/profile.route");
 const emergencyRoute = require("./src/routes/emergency.route");
 const chatRoute = require("./src/routes/chat.route");
+const paymentRoute = require("./src/routes/payment.route");
 
 const app = express();
 const server = http.createServer(app);
@@ -43,6 +44,7 @@ app.use("/api/ai", aiRoute);
 app.use("/api/profile", profileRoute);
 app.use("/api/emergency", emergencyRoute);
 app.use("/api/chat", chatRoute);
+app.use("/api/payments", paymentRoute);
 
 server.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

@@ -68,7 +68,12 @@ const AdminDashboard = () => {
 
   // Derived metrics
   const pendingAppointments = appointments.filter(
-    (a) => a.status === "pending_admin_assignment" || a.status === "pending"
+    (a) =>
+      (a.status === "pending_admin_assignment" || a.status === "pending") &&
+      a.paymentStatus === "paid"
+  );
+  const unpaidAppointments = appointments.filter(
+    (a) => a.paymentStatus && a.paymentStatus !== "paid"
   );
   const attentionNeeded = appointments.filter(
     (a) =>
@@ -133,7 +138,11 @@ const AdminDashboard = () => {
           value={pendingAppointments.length}
           icon={Clock}
           color="bg-amber-500"
-          subtext="Awaiting doctor selection"
+          subtext={
+            unpaidAppointments.length > 0
+              ? `Paid & awaiting doc (${unpaidAppointments.length} unpaid)`
+              : "Awaiting doctor selection"
+          }
           linkTo="/admin/appointment"
         />
         <StatCard

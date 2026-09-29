@@ -1,11 +1,13 @@
 import React, { useContext, useState } from "react";
 import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { bookAppointment } from "../../redux/slices/appointmentSlice";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import Select from "react-select";
 import { AuthContext } from "../../api/context/AuthContext";
-import { CheckCircle, AlertCircle } from "lucide-react";
+import { CheckCircle, AlertCircle, CreditCard, ArrowRight } from "lucide-react";
+import PaymentModal from "../../components/PaymentModal";
 
 const appointmentTypes = [
   { value: "Outpatient", label: "Outpatient" },
@@ -17,6 +19,7 @@ const appointmentTypes = [
 
 const BookAppointmentForm = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     name: user?.username || "",
@@ -29,6 +32,8 @@ const BookAppointmentForm = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [createdAppointment, setCreatedAppointment] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,15 +64,14 @@ const BookAppointmentForm = () => {
     try {
       const resultAction = await dispatch(bookAppointment(newBody));
       if (bookAppointment.fulfilled.match(resultAction)) {
+        const appt = resultAction.payload;
+        setCreatedAppointment(appt);
         setIsSuccess(true);
-        setMessage("Appointment booked successfully! It is now pending administrative doctor assignment.");
-        setFormData({
-          name: user?.username || "",
-          age: "",
-          type: "Outpatient",
-          reason: "",
-          appointmentDate: "",
-        });
+        setMessage(
+          "Appointment request initiated with pending payment. Please complete the CamPay mobile payment to confirm."
+        );
+        // Automatically open the CamPay payment popup
+        setIsPaymentModalOpen(true);
       } else {
         setIsSuccess(false);
         setMessage(resultAction.payload || "Failed to book appointment.");
@@ -78,6 +82,20 @@ const BookAppointmentForm = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePaymentSuccess = () => {
+    setIsSuccess(true);
+    setMessage(
+      "Payment successfully confirmed via CamPay! Your appointment is now confirmed and queued for administrative doctor allocation."
+    );
+    setFormData({
+      name: user?.username || "",
+      age: "",
+      type: "Outpatient",
+      reason: "",
+      appointmentDate: "",
+    });
   };
 
   return (
@@ -178,13 +196,41 @@ const BookAppointmentForm = () => {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col items-center">
+        <div className="mt-8 flex flex-col items-center gap-3">
           <Button
             text={loading ? "Booking Consultation..." : "Submit Appointment Request"}
             type="submit"
           />
+
+          {createdAppointment && createdAppointment.paymentStatus !== "paid" && (
+            <button
+              type="button"
+              onClick={() => setIsPaymentModalOpen(true)}
+              className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2"
+            >
+              <CreditCard className="w-4 h-4" />
+              Complete Payment for This Consultation ({createdAppointment.amount || 5000} XAF)
+            </button>
+          )}
+
+          {isSuccess && (
+            <Link
+              to="/patient/overview"
+              className="text-xs text-purple-700 hover:text-purple-900 font-semibold flex items-center gap-1 mt-1"
+            >
+              View My Appointments <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          )}
         </div>
       </form>
+
+      {/* CamPay Mobile Money Payment Popup */}
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        appointment={createdAppointment}
+        onSuccess={handlePaymentSuccess}
+      />
     </div>
   );
 };

@@ -78,6 +78,42 @@ const StatusBadge = ({ status }) => {
   );
 };
 
+// Payment Badge Component
+const PaymentBadge = ({ status, amount }) => {
+  switch (status) {
+    case "paid":
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+          <CheckCircle className="w-3 h-3 text-emerald-600" />
+          Paid {amount ? `(${amount.toLocaleString()} XAF)` : ""}
+        </span>
+      );
+    case "failed":
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-800 border border-red-300">
+          <XCircle className="w-3 h-3 text-red-600" />
+          Payment Failed
+        </span>
+      );
+    case "processing":
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-300">
+          <RefreshCw className="w-3 h-3 text-purple-600 animate-spin" />
+          Processing Payment
+        </span>
+      );
+    case "pending":
+    default:
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+          <Clock className="w-3 h-3 text-amber-600" />
+          Unpaid / Pending
+        </span>
+      );
+  }
+};
+
+
 // Doctor Selection Modal
 const DoctorModal = ({ isOpen, onClose, onSelectDoctor, selectedAppointment, doctors }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -266,10 +302,14 @@ const AdminAppointments = () => {
 
     if (activeTab === "pending") {
       return (
-        appt.status === "pending_admin_assignment" ||
-        appt.status === "pending" ||
-        appt.status === "awaiting_reassignment"
+        (appt.status === "pending_admin_assignment" ||
+          appt.status === "pending" ||
+          appt.status === "awaiting_reassignment") &&
+        appt.paymentStatus === "paid"
       );
+    }
+    if (activeTab === "unpaid") {
+      return appt.paymentStatus !== "paid";
     }
     if (activeTab === "attention") {
       return (
@@ -294,10 +334,10 @@ const AdminAppointments = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
-            Appointment Management & Doctor Assignment
+            Appointment Management &amp; Doctor Assignment
           </h1>
           <p className="text-sm text-gray-500">
-            Review patient bookings, assign doctors, and manage reassignment workflows.
+            Review patient bookings, verify consultation payments, and manage physician assignments.
           </p>
         </div>
 
@@ -329,7 +369,8 @@ const AdminAppointments = () => {
         <div className="flex gap-2 overflow-x-auto w-full md:w-auto">
           {[
             { id: "all", label: "All" },
-            { id: "pending", label: "Pending Assignment" },
+            { id: "pending", label: "Pending Assignment (Paid)" },
+            { id: "unpaid", label: "Pending Payment / Unpaid" },
             { id: "attention", label: "Needs Attention / Rejections" },
             { id: "active", label: "Active / Accepted" },
             { id: "completed", label: "Completed" },
@@ -404,7 +445,10 @@ const AdminAppointments = () => {
                         </p>
                       </div>
                     </div>
-                    <StatusBadge status={appt.status} />
+                    <div className="flex flex-col items-end gap-1">
+                      <StatusBadge status={appt.status} />
+                      <PaymentBadge status={appt.paymentStatus} amount={appt.amount} />
+                    </div>
                   </div>
 
                   {/* Complaint & Appointment Info */}
@@ -491,8 +535,25 @@ const AdminAppointments = () => {
                   <div className="flex items-center gap-2">
                     {/* Assign / Reassign Button */}
                     <button
-                      onClick={() => handleOpenAssignModal(appt)}
-                      className="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition shadow-sm flex items-center gap-1"
+                      onClick={() => {
+                        if (appt.paymentStatus !== "paid") {
+                          alert(
+                            "Cannot assign doctor: This appointment has not been paid yet. The patient must complete payment first."
+                          );
+                          return;
+                        }
+                        handleOpenAssignModal(appt);
+                      }}
+                      className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1 transition ${
+                        appt.paymentStatus === "paid"
+                          ? "bg-purple-600 text-white hover:bg-purple-700"
+                          : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
+                      }`}
+                      title={
+                        appt.paymentStatus !== "paid"
+                          ? "Consultation payment is pending — cannot assign doctor"
+                          : "Assign doctor"
+                      }
                     >
                       <Stethoscope className="w-3.5 h-3.5" />
                       {doctor ? "Reassign Doctor" : "Assign Doctor"}

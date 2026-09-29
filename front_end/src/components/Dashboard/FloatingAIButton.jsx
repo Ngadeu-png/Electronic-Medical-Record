@@ -11,7 +11,6 @@ const FloatingAIButton = () => {
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const userId = currentUser?._id;
 
-  // Automatically close floating drawer when route changes to auth pages
   useEffect(() => {
     if (location.pathname.startsWith("/auths") || location.pathname === "/") {
       setIsOpen(false);
@@ -36,7 +35,7 @@ const FloatingAIButton = () => {
           <div className="bg-purple-900 text-white px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-semibold">
               <Bot className="w-4 h-4 text-purple-300" />
-              <span>CentriCare AI Assistant (Gemini)</span>
+              <span>CentriCare AI Assistant</span>
             </div>
             <button
               onClick={() => setIsOpen(false)}
@@ -68,8 +67,8 @@ const FloatingAIButton = () => {
           </span>
         </div>
 
-        <span className="text-xs font-bold tracking-wide pr-1">
-          {isOpen ? "Close AI" : "Ask AI Assistant"}
+        <span className="text-xs font-bold tracking-wide">
+          {isOpen ? "Close AI" : "Ask your questions Here!"}
         </span>
 
         {isOpen ? (

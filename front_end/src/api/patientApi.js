@@ -25,6 +25,33 @@ export const patientApi = {
   },
 
   // ─────────────────────────────────────────────
+  //  CamPay Payment Integration
+  // ─────────────────────────────────────────────
+  initiatePayment: async (paymentData) => {
+    const res = await fetch(`${BASE_URL}/payments/initiate`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(paymentData),
+    });
+    return handleApiResponse(res);
+  },
+
+  verifyPayment: async (reference) => {
+    const res = await fetch(`${BASE_URL}/payments/verify/${reference}`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+    });
+    return handleApiResponse(res);
+  },
+
+  getAppointmentPayment: async (appointmentId) => {
+    const res = await fetch(`${BASE_URL}/payments/appointment/${appointmentId}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleApiResponse(res);
+  },
+
+  // ─────────────────────────────────────────────
   //  Personal Profile & Emergency Medical Profile
   // ─────────────────────────────────────────────
   getMyProfile: async () => {

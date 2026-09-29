@@ -94,6 +94,25 @@ const appointmentSchema = new mongoose.Schema(
     },
     // Full audit trail
     assignmentHistory: [assignmentHistorySchema],
+    // Payment details
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "processing", "paid", "failed"],
+      default: "pending",
+      index: true,
+    },
+    amount: {
+      type: Number,
+      default: 25,
+    },
+    currency: {
+      type: String,
+      default: "XAF",
+    },
+    paymentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Payment",
+    },
   },
   { timestamps: true }
 );
@@ -405,6 +424,72 @@ const Conversation = mongoose.model("Conversation", conversationSchema);
 const Message = mongoose.model("Message", messageSchema);
 const ContractDeployment = mongoose.model("ContractDeployment", contractDeploymentSchema);
 
+// ─────────────────────────────────────────────
+//  Payment Schema (CamPay Mobile Money)
+// ─────────────────────────────────────────────
+const paymentSchema = new mongoose.Schema(
+  {
+    appointment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Appointment",
+      required: true,
+      index: true,
+    },
+    patient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    currency: {
+      type: String,
+      default: "XAF",
+    },
+    paymentMethod: {
+      type: String,
+      enum: ["MTN", "ORANGE", "CAMPAY"],
+      default: "MTN",
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "processing", "paid", "failed"],
+      default: "pending",
+      index: true,
+    },
+    reference: {
+      type: String,
+      index: true,
+    },
+    externalReference: {
+      type: String,
+      index: true,
+    },
+    operator: {
+      type: String,
+    },
+    operatorReference: {
+      type: String,
+    },
+    campayResponse: {
+      type: mongoose.Schema.Types.Mixed,
+    },
+    failureReason: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
+
+const Payment = mongoose.model("Payment", paymentSchema);
+
 module.exports = {
   User,
   Appoints,
@@ -417,4 +502,6 @@ module.exports = {
   Conversation,
   Message,
   ContractDeployment,
+  Payment,
 };
+

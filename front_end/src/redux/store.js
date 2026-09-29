@@ -6,6 +6,7 @@ import appointmentReducer from "./slices/appointmentSlice";
 import medicalRecordReducer from "./slices/medicalRecordSlice";
 import aiReducer from "./slices/aiSlice";
 import chatReducer from "./slices/chatSlice";
+import paymentReducer from "./slices/paymentSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     medicalRecords: medicalRecordReducer,
     ai: aiReducer,
     chat: chatReducer,
+    payments: paymentReducer,
   },
 });
 
