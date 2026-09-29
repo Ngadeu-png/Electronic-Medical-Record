@@ -27,6 +27,7 @@ const getAllAppointments = async (req, res) => {
       .populate("userId", "username email mrn dob phone gender")
       .populate("doctorId", "username email specialty")
       .populate("redirectedToDoctor", "username email specialty")
+      .populate("paymentId")
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -57,6 +58,7 @@ const getPendingAppointments = async (req, res) => {
     })
       .populate("userId", "username email mrn dob phone gender")
       .populate("doctorId", "username email specialty")
+      .populate("paymentId")
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -88,6 +90,14 @@ const assignDoctor = async (req, res) => {
     const appointment = await Appoints.findById(appointmentId);
     if (!appointment) {
       return res.status(404).json({ status: "error", message: "Appointment not found" });
+    }
+
+    // Require completed payment before doctor assignment
+    if (appointment.paymentStatus && appointment.paymentStatus !== "paid") {
+      return res.status(400).json({
+        status: "error",
+        message: "Cannot assign a doctor to an unpaid appointment. Payment must be completed first.",
+      });
     }
 
     // Verify doctor exists

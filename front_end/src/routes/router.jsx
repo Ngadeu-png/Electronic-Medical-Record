@@ -16,6 +16,7 @@ import ResetPassword from "../pages/auths/ResetPassword";
 // Patient
 import PatientLayout from "../layout/PatientLayout";
 import Overview from "../pages/patient/Patientoverview";
+import MyAppointments from "../pages/patient/MyAppointments";
 import BookAppointmentForm from "../pages/patient/appointment";
 import ConsultationJoin from "../pages/patient/consultation";
 import Myrecord from "../pages/patient/Myrecord";
@@ -58,7 +59,7 @@ export const router = createBrowserRouter(
         <Route index element={<Overview />} />
         <Route path="profile" element={<PatientProfile />} />
         <Route path="appointment" element={<BookAppointmentForm />} />
-        <Route path="my-appointments" element={<Overview />} />
+        <Route path="my-appointments" element={<MyAppointments />} />
         <Route path="consultation" element={<ConsultationJoin />} />
         <Route path="Myrecord" element={<Myrecord />} />
         <Route path="ai" element={<AIPage />} />

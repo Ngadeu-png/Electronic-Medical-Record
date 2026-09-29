@@ -126,6 +126,7 @@ const PatientSidebar = () => {
               </li>
             )}
           </NavLink>
+
         </ul>
       </div>
 

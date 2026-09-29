@@ -1,85 +1,16 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchMyAppointments } from "../../redux/slices/appointmentSlice";
-import { fetchPatientRecords } from "../../redux/slices/medicalRecordSlice";
 import {
-  Calendar,
-  CheckCircle,
   Stethoscope,
   ArrowRight,
   PlusCircle,
-  AlertCircle,
+  ClipboardList,
+  UserRoundCheck,
+  FileHeart,
 } from "lucide-react";
 
-const StatusBadge = ({ status }) => {
-  const getBadgeStyle = () => {
-    switch (status) {
-      case "pending_admin_assignment":
-      case "pending":
-        return "bg-amber-100 text-amber-800 border-amber-300";
-      case "assigned":
-        return "bg-blue-100 text-blue-800 border-blue-300";
-      case "accepted":
-        return "bg-emerald-100 text-emerald-800 border-emerald-300";
-      case "completed":
-        return "bg-green-100 text-green-800 border-green-300";
-      case "rejected_by_doctor":
-      case "redirected_to_admin":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-300";
-    }
-  };
-
-  const getLabel = () => {
-    switch (status) {
-      case "pending_admin_assignment":
-      case "pending":
-        return "Pending Admin Assignment";
-      case "assigned":
-        return "Doctor Assigned";
-      case "accepted":
-        return "Confirmed by Doctor";
-      case "completed":
-        return "Consultation Completed";
-      case "rejected_by_doctor":
-        return "Awaiting Reassignment";
-      case "redirected_to_admin":
-        return "Admin Reassigning";
-      default:
-        return status;
-    }
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getBadgeStyle()}`}
-    >
-      {getLabel()}
-    </span>
-  );
-};
-
 const Overview = () => {
-  const dispatch = useDispatch();
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const { myAppointments, status: apptStatus } = useSelector(
-    (state) => state.appointments
-  );
-  const { records } = useSelector((state) => state.medicalRecords);
-
-  useEffect(() => {
-    dispatch(fetchMyAppointments());
-    if (currentUser._id) {
-      dispatch(fetchPatientRecords(currentUser._id));
-    }
-  }, [dispatch, currentUser._id]);
-
-  const totalAppointments = myAppointments.length;
-  const activeAppointments = myAppointments.filter(
-    (a) => a.status === "accepted" || a.status === "assigned"
-  );
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Welcome Banner */}
@@ -105,101 +36,37 @@ const Overview = () => {
         </Link>
       </div>
 
-      {/* Summary KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total Appointments</span>
-            <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center">
-            </div>
-          </div>
-          <div className="text-3xl font-extrabold text-gray-800">{totalAppointments}</div>
-          <p className="text-xs text-gray-400 mt-1">All recorded bookings</p>
-        </div>
-
-        {/* Emerald Green accent card — Confirmed & Active */}
-        <div className="bg-gradient-to-br from-white to-emerald-50/50 p-5 rounded-2xl border border-emerald-200 shadow-sm hover:shadow-md transition">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Confirmed &amp; Active</span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 text-emerald-600" />
-            </div>
-          </div>
-          <div className="text-3xl font-extrabold text-emerald-900">{activeAppointments.length}</div>
-          <p className="text-xs text-emerald-700/80 mt-1 font-medium">Doctor accepted &amp; scheduled</p>
-        </div>
-
-      </div>
-
-      {/* Main Section: Recent Appointments & Assigned Doctors */}
+      {/* Patient guide and clinical navigation */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Cols: My Consultations Timeline */}
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-gray-800">
-              My Appointments & Consultation Status
-            </h2>
-            <Link
-              to="/patient/appointment"
-              className="text-xs font-semibold text-purple-600 hover:text-purple-700"
-            >
-              + Book New
-            </Link>
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+              <ClipboardList className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-gray-800">How your care works</h2>
+              <p className="text-xs text-gray-500">A simple guide to using your patient portal.</p>
+            </div>
           </div>
-
-          {apptStatus === "loading" && myAppointments.length === 0 ? (
-            <div className="text-center py-8 text-gray-400 text-xs">
-              Loading your appointments...
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-xl bg-purple-50 p-4">
+              <ClipboardList className="w-5 h-5 text-purple-600 mb-2" />
+              <h3 className="text-sm font-bold text-gray-800">1. Request care</h3>
+              <p className="text-xs text-gray-600 mt-1">Book a consultation and describe what you need help with.</p>
             </div>
-          ) : myAppointments.length === 0 ? (
-            <div className="text-center py-10 text-gray-400 text-xs">
-              <Calendar className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-              You haven't booked any appointments yet. Click "Book New Consultation" above.
+            <div className="rounded-xl bg-blue-50 p-4">
+              <UserRoundCheck className="w-5 h-5 text-blue-600 mb-2" />
+              <h3 className="text-sm font-bold text-gray-800">2. Meet your doctor</h3>
+              <p className="text-xs text-gray-600 mt-1">The hospital team assigns your request to the right practitioner.</p>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {myAppointments.map((appt) => {
-                const doctor = appt.doctorId;
-                return (
-                  <div
-                    key={appt._id}
-                    className="p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-sm text-gray-800">
-                          {appt.reason}
-                        </span>
-                        <span className="text-xs text-gray-400">• {appt.type}</span>
-                      </div>
-
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          {appt.appointmentDate
-                            ? new Date(appt.appointmentDate).toLocaleString()
-                            : new Date(appt.createdAt).toLocaleDateString()}
-                        </span>
-
-                        {doctor && (
-                          <span className="flex items-center gap-1 text-purple-700 font-medium">
-                            <Stethoscope className="w-3.5 h-3.5" />
-                            Dr. {doctor.username} ({doctor.specialty || "Specialist"})
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <StatusBadge status={appt.status} />
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="rounded-xl bg-emerald-50 p-4">
+              <FileHeart className="w-5 h-5 text-emerald-600 mb-2" />
+              <h3 className="text-sm font-bold text-gray-800">3. Follow your care</h3>
+              <p className="text-xs text-gray-600 mt-1">Check your records and messages after your consultation.</p>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Right Col: Quick Clinical Summary & Navigation */}
         <div className="space-y-6">
           <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
             <h3 className="text-sm font-bold text-gray-800 mb-3">Clinical Actions</h3>
@@ -243,6 +110,7 @@ const Overview = () => {
           </div>
         </div>
       </div>
+
     </div>
   );
 };
